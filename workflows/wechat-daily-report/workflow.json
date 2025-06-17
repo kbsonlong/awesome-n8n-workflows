@@ -1,0 +1,798 @@
+{
+  "name": "WeChat-Daily-Digest-AI-v1.0.0",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        -940
+      ],
+      "id": "f4f3f35d-8bb5-4ea8-ad44-d5428feef0e7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## 智能微信群聊日报生成器\n### 📋 基本信息\n- 工作流名称: WeChat-Daily-Digest-AI\n- 版本: v1.0.0\n- 创建者: 林月半子聊AI\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n基于 ChatlogMCP 的微信群聊分析自动化工具，自动获取微信群聊记录，通过AI智能分析生成精美的HTML格式群聊日报，实现从海量消息到精华内容的自动化提取。\n\n### 配置说明\n1. 配置群聊参数节点\n   - 替换群聊名称(支持暂时禁用)\n   - 默认自动设置为前一天\n   - 模板可按需调整\n2. 配置 Gemini 凭据\n",
+        "height": 480,
+        "width": 760,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -1200
+      ],
+      "id": "4ef65ce3-27e4-43ed-9153-9871c9326883",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c2a2eec2-4ead-4544-83db-73aba917f553",
+              "name": "groups",
+              "value": "[\n  {\n    \"group_name\": \"n8n自动化实战交流群\",\n    \"group_owner\": \"LQ\",\n    \"description\": \"n8n自动化实战交流群\",\n    \"enabled\": true\n  },\n  {\n    \"group_name\": \"n8n学习交流\", \n    \"group_owner\": \"向阳乔木\",\n    \"description\": \"n8n学习交流\",\n    \"enabled\": true\n  }\n]",
+              "type": "array"
+            },
+            {
+              "id": "6dab17d2-2e5e-40e3-b5d9-0abcdac0dde8",
+              "name": "date",
+              "value": "={{ $now.minus({days: 1}).format('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "web-style-id",
+              "name": "web_style_template",
+              "value": "<!DOCTYPE html><html lang=\"zh-CN\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>[在此处填写报告标题] - [日期]</title><link rel=\"stylesheet\" href=\"https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css\"><link rel=\"stylesheet\" href=\"https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\"><script src=\"https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js\" xintegrity=\"sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5rLesXWW/sGuLhYFChxgYnz2Q==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script><script src=\"https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js\"></script><style>        :root {                        --bg-primary: #f5f4ee;             --bg-secondary: #faf9f6;             --bg-tertiary: #f1f3f5;             --text-primary: #212529;             --text-secondary: #495057;             --accent-primary: #ff8906;             --accent-secondary: #f76707;             --accent-tertiary: #e8590c;             --accent-blue: #339af0;                 --accent-purple: #7048e8;             --accent-cyan: #22b8cf;                 --highlight-keyword-bg: #ffe8cc;             --highlight-name-color: #7048e8;             --card-padding: 24px;             --grid-gap: 16px;             --card-radius: 12px;             --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);             --font-family: 'Inter', 'SF Pro Display', 'Segoe UI', sans-serif;         }        * {            margin: 0;            padding: 0;            box-sizing: border-box;        }        body {            font-family: var(--font-family);             background-color: var(--bg-primary);            color: var(--text-primary);            line-height: 1.6;            font-size: 16px;            width: 100%;            max-width: 1000px;             margin: 0 auto;             padding: 20px;         }        body.modal-active {            overflow: hidden;         }        h1, h2, h3, h4 {            font-weight: 600;            letter-spacing: 0.5px;        }        h1 {            font-size: 2.5rem;             margin-bottom: 0.5rem;            color: var(--accent-primary);        }        h2 {             font-size: 1.75rem;             margin-bottom: 1rem;            color: var(--accent-primary);         }        h3 {             font-size: 1.25rem;             margin-bottom: 0.75rem;            color: var(--accent-blue);         }        .grid-container {            display: grid;            grid-template-columns: repeat(12, 1fr);             grid-auto-rows: minmax(100px, auto);             gap: var(--grid-gap);            margin-top: 20px;            grid-template-areas:                 \"main      main      main      main      main      main      main      main      main      main      main      main\"                \"topics    topics    topics    topics    topics    topics    topics    topics    topics    topics    topics    topics\"                \"mindmap   mindmap   mindmap   mindmap   mindmap   mindmap   mindmap   mindmap   mindmap   mindmap   mindmap   mindmap\"                \"quote     quote     quote     quote     quote     quote     links     links     links     links     links     links\"                \"stats     stats     stats     stats     stats     stats     stats     wordcloud wordcloud wordcloud wordcloud wordcloud\";        }        .card {            background-color: var(--bg-secondary);            border-radius: var(--card-radius);            padding: var(--card-padding);            box-shadow: var(--card-shadow);            position: relative;             overflow: hidden;             transition: transform 0.3s ease, box-shadow 0.3s ease;            display: flex;             flex-direction: column;         }        .card:hover {            transform: translateY(-5px);             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);         }                .card::before {            content: '';            position: absolute;            top: 0;            left: 0;            width: 100%;            height: 3px;            background: var(--accent-primary);        }                .card-icon {            position: absolute;            bottom: var(--card-padding);            right: var(--card-padding);            font-size: 4rem;            opacity: 0.07;            color: var(--accent-primary);            z-index: 0;         }                .main-card { grid-area: main; }        .topic-cards-wrapper {            grid-area: topics;            display: grid;            grid-template-columns: repeat(12, 1fr);            gap: var(--grid-gap);        }        .mindmap-card-container { grid-area: mindmap; }         .quote-card { grid-area: quote; }        .links-card { grid-area: links; }        .stats-card { grid-area: stats; }        .wordcloud-card { grid-area: wordcloud; }        .topic-card {            grid-column: span 6;             min-height: 250px;        }        .topic-card > .topic-card-content-wrapper {            flex-grow: 1;             padding-bottom: 1rem;         }        .topic-cards-wrapper > .topic-card:nth-last-child(1):nth-child(odd) {            grid-column: span 12;        }        .main-card h1 { text-align: center; }        .main-card .date { text-align: center; }        .date { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1rem; }        .meta-info { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 1rem; justify-content: center; }        .meta-info span { background-color: var(--bg-tertiary); padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; color: var(--accent-blue); }        .summary { margin-top: 1rem; line-height: 1.7; text-align: left; }        .topic-category { display: inline-block; background-color: var(--accent-tertiary); color: var(--bg-primary); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; margin-bottom: 0.5rem; }        .topic-keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 0.75rem; margin-bottom: 0.75rem; }        .keyword { background-color: var(--bg-tertiary); color: var(--accent-primary); padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }        .highlight-keyword { background-color: var(--highlight-keyword-bg); padding: 1px 2px; border-radius: 2px; font-weight: 500; display: inline; line-height: 1.2; box-decoration-break: clone; -webkit-box-decoration-break: clone; }        .highlight-name { color: var(--highlight-name-color); font-weight: 500; }        .topic-mentions { font-size: 0.9rem; color: var(--text-secondary); }        .quote { position: relative; padding-left: 20px; margin: 10px 0; font-style: italic; color: var(--text-secondary); }        .quote::before { content: '\"'; position: absolute; left: 0; top: 0; font-size: 1.5rem; color: var(--accent-tertiary); }        .quote-author { text-align: right; font-size: 0.9rem; color: var(--accent-tertiary); margin-top: 5px; }        .link-item { display: flex; align-items: center; margin-bottom: 10px; padding: 8px; border-radius: 6px; background-color: var(--bg-tertiary); transition: background-color 0.2s ease; text-decoration: none; }        .link-item:hover { background-color: rgba(51, 154, 240, 0.1); }        .link-item a { text-decoration: none; color: inherit; display: flex; align-items: center; width: 100%; }        .link-item a:hover .link-title { text-decoration: underline; color: var(--accent-blue); }        .link-icon { margin-right: 10px; color: var(--accent-blue); }        .link-title { flex-grow: 1; color: var(--text-primary); }        .link-title.is-link { color: var(--accent-blue); }        .link-title.is-link:hover { text-decoration: underline; }        .user-stats-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }        .user-stats-table th { text-align: center; padding: 0.75rem 0.5rem; border-bottom: 2px solid var(--accent-primary); color: var(--text-primary); font-weight: 600; font-size: 0.9rem; }        .user-stats-table td { padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--bg-tertiary); color: var(--text-secondary); font-size: 0.85rem; vertical-align: top; text-align: left; }        .user-stats-table .user-name-col { width: 25%; font-weight: 500; word-break: break-all; }        .user-stats-table .message-count-col { text-align: center; width: 15%; white-space: nowrap; }        .user-stats-table .contribution-col { width: 60%; word-break: break-all; }        .user-stats-table tr:last-child td { border-bottom: none; }        .wordcloud { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 20px 0; }        .wordcloud-item { padding: 5px 10px; border-radius: 4px; font-weight: 500; transition: transform 0.2s ease; }        .wordcloud-item:hover { transform: scale(1.1); }        .size-1 { font-size: 0.9rem; color: var(--text-secondary); }        .size-2 { font-size: 1.1rem; color: var(--accent-cyan); }        .size-3 { font-size: 1.3rem; color: var(--accent-blue); }        .size-4 { font-size: 1.5rem; color: var(--accent-purple); }        .size-5 { font-size: 1.8rem; color: var(--accent-tertiary); }        .action-buttons-container { text-align: center; margin: 20px 0; padding-bottom: 20px; }        .action-button { background-color: var(--accent-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--card-radius); font-size: 1rem; font-weight: 500; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin: 5px 10px; box-shadow: var(--card-shadow); display: inline-flex; align-items: center; justify-content: center; }        .action-button:hover { background-color: var(--accent-secondary); transform: translateY(-2px); }        .action-button i, .action-button .fas { margin-right: 8px; }        .footer { margin-top: 30px; text-align: center; color: var(--text-secondary); font-size: 0.9rem; }        #report-content-wrapper .footer { margin-top: 30px; padding-bottom: 20px; }                .mindmap-card {             min-height: 400px;                     }        .mindmap-card h2 i { margin-right: 8px; }        .mindmap-controls { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; }        .mindmap-controls button { background-color: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: var(--card-radius); font-size: 0.9rem; cursor: pointer; transition: background-color 0.2s ease; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; }        .mindmap-controls button:hover { background-color: #228be6;  }        .mindmap-controls button i { margin-right: 5px; }        .mindmap-controls .fullscreen-toggle-btn { margin-left: auto; }        .mermaid-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; overflow: auto; background-color: #fff; border-radius: 8px; padding: 10px; border: 1px solid var(--bg-tertiary); min-height: 300px; cursor: grab; }        .mermaid-container.dragging { cursor: grabbing; }        .mermaid-container:empty::before { content: \"在此处生成或粘贴Mermaid导图代码。\"; color: var(--text-secondary); font-style: italic; text-align: center; padding: 20px; }        .mermaid-container svg { max-width: none; height: auto; display: block; transition: transform 0.2s ease-out; }                #mermaid-main-feedback-message, #mermaid-modal-feedback-message { text-align: center; margin-top: 15px; padding: 8px; border-radius: 4px; font-weight: 500; font-size: 0.9rem; display: none; }        #mermaid-main-feedback-message.success, #mermaid-modal-feedback-message.success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; display: block; }        #mermaid-main-feedback-message.error, #mermaid-modal-feedback-message.error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; display: block; }        #mermaid-main-feedback-message.info, #mermaid-modal-feedback-message.info { color: #0c5460; background-color: #d1ecf1; border: 1px solid #bee5eb; display: block; }                        #feedback-message { text-align: center; margin-top: 10px; font-weight: 500; }        #feedback-message.success { color: green; }        #feedback-message.error { color: red; }                .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }        .modal-overlay.active { display: flex; }        .modal-content {             width: 95%; height: 90%; max-width: 1200px;                     }        .modal-close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2.2rem; color: var(--text-secondary); cursor: pointer; line-height: 1; padding: 5px; z-index: 1010; }        .modal-close-btn:hover { color: var(--text-primary); }        #modalMermaidContainer { flex-grow: 1; min-height: 0;  }        #modalMermaidContainer:empty::before { content: \"导图内容将在此显示。\"; color: var(--text-secondary); font-style: italic; text-align: center; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100%; }        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }        .card { animation: fadeIn 0.5s ease forwards; }        .main-card { animation-delay: 0.1s; }        .topic-cards-wrapper .topic-card:nth-child(1) { animation-delay: 0.2s; }        .topic-cards-wrapper .topic-card:nth-child(2) { animation-delay: 0.3s; }        .topic-cards-wrapper .topic-card:nth-child(3) { animation-delay: 0.4s; }        .topic-cards-wrapper .topic-card:nth-child(4) { animation-delay: 0.5s; }        .mindmap-card-container .card { animation-delay: 0.6s; }         .quote-card { animation-delay: 0.7s; }        .links-card { animation-delay: 0.8s; }        .stats-card { animation-delay: 0.9s; }        .wordcloud-card { animation-delay: 1.0s; }        #report-content-wrapper .footer { animation: fadeIn 0.5s ease forwards; animation-delay: 1.1s; }         .action-buttons-container { animation: fadeIn 0.5s ease forwards; animation-delay: 1.2s; }         @media (max-width: 768px) {            body { padding: 10px; font-size: 14px; }            h1 { font-size: 1.8rem; }            h2 { font-size: 1.4rem; }            h3 { font-size: 1.1rem; }            .grid-container {                grid-template-columns: 1fr;                grid-template-areas:                    \"main\"                    \"topics\"                    \"mindmap\"                    \"quote\"                    \"links\"                    \"stats\"                    \"wordcloud\";            }            .topic-cards-wrapper { grid-template-columns: 1fr; }            .topic-card { grid-column: 1 / -1; min-height: auto; }            .topic-card > .topic-card-content-wrapper { padding-bottom: 1rem; }            .topic-mentions { position: static; margin-top: 10px; margin-bottom: 10px; text-align: left; }            .card-icon { font-size: 2.5rem; opacity:0.05;  }            .mindmap-card .card-icon { bottom: 15px; right: 15px;  }            .user-stats-table th, .user-stats-table td { padding: 0.5rem 0.25rem; font-size: 0.8rem; }            .user-stats-table td { text-align: left; }            .user-stats-table .message-count-col { text-align: center; }            .action-button { padding: 8px 15px; font-size: 0.9rem; }            .action-buttons-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }            .action-buttons-container .action-button { width: calc(50% - 10px); min-width: 180px; margin: 5px 0; }                                    .mindmap-card .card { padding: 15px; }            .mindmap-controls button { font-size: 0.8rem; padding: 6px 10px; }            .modal-content { width: 100%; height: 95%; }            .modal-close-btn { font-size: 1.8rem; top:10px; right:10px;}        }        @media (max-width: 480px) {            .action-buttons-container .action-button { width: 80%; }            .user-stats-table { display: block; overflow-x: auto; }            .user-stats-table th, .user-stats-table td { white-space: normal; }            .user-stats-table thead, .user-stats-table tbody, .user-stats-table tr { display: block; }            .user-stats-table tr { border-bottom: 1px solid var(--bg-tertiary); }            .user-stats-table th { display: none; }            .user-stats-table td { display: block; text-align: left; border-bottom: none; padding-left: 0.5rem; }            .user-stats-table td.message-count-col { text-align: left; }            .user-stats-table td::before { content: attr(data-label); font-weight: bold; display: inline-block; width: 100px; margin-right: 10px; color: var(--text-primary); text-align: left; }            .user-stats-table tr:last-child { border-bottom: none; }        }</style></head><body><div id=\"report-content-wrapper\"><div class=\"grid-container\"><div class=\"card main-card\"><h1 contenteditable=\"true\">[主报告标题 - 例如：AI产品团日报]</h1><div class=\"date\">[日期 - 例如：2025年5月19日]</div><div class=\"meta-info\"><span><i class=\"fas fa-comment\"></i> 消息数: [数字]+</span><span><i class=\"fas fa-users\"></i> 活跃用户: [数字]+</span><span><i class=\"fas fa-fire\"></i> 热点话题: [数字]</span></div><p class=\"summary\">[在此处填写当日讨论的总体摘要。保持简洁明了，突出群组的主要主题和氛围。]</p><i class=\"fas fa-microchip card-icon\"></i></div><div class=\"topic-cards-wrapper\"><div class=\"card topic-card\"><div class=\"topic-card-content-wrapper\"><h2 contenteditable=\"true\"><i class=\"fas fa-lightbulb\"></i> [主题1标题]</h2><div class=\"topic-category\">[分类1 - 例如：工具技巧]</div><p>关于<span class=\"highlight-keyword\">插件功能</span>的讨论，特别是<span class=\"highlight-name\">@用户A</span>提到的<span class=\"highlight-keyword\">上下文处理</span>能力。</p><div class=\"topic-keywords\"><span class=\"keyword\">[关键词1A]</span><span class=\"keyword\">[关键词1B]</span><span class=\"keyword\">[关键词1C]</span></div><div class=\"topic-mentions\"><i class=\"fas fa-bullhorn\"></i> 提及次数: [数量1]</div></div><i class=\"fas fa-tools card-icon\"></i></div><div class=\"card topic-card\"><div class=\"topic-card-content-wrapper\"><h2 contenteditable=\"true\"><i class=\"fas fa-rocket\"></i> [主题2标题]</h2><div class=\"topic-category\">[分类2 - 例如：新功能]</div><p><span class=\"highlight-name\">@用户B</span>分享了<span class=\"highlight-keyword\">AI搜索</span>的最新进展和<span class=\"highlight-keyword\">地区限制</span>问题。</p><div class=\"topic-keywords\"><span class=\"keyword\">[关键词2A]</span><span class=\"keyword\">[关键词2B]</span></div><div class=\"topic-mentions\"><i class=\"fas fa-bullhorn\"></i> 提及次数: [数量2]</div></div><i class=\"fas fa-star card-icon\"></i></div><div class=\"card topic-card\"><div class=\"topic-card-content-wrapper\"><h2 contenteditable=\"true\"><i class=\"fas fa-comments-dollar\"></i> [主题3标题]</h2><div class=\"topic-category\">[分类3 - 例如：工具体验]</div><p>大家对<span class=\"highlight-keyword\">Agent技术</span>的<span class=\"highlight-keyword\">商业化前景</span>进行了探讨，<span class=\"highlight-name\">@用户C</span>提出了独到见解。</p><div class=\"topic-keywords\"><span class=\"keyword\">[关键词3A]</span><span class=\"keyword\">[关键词3B]</span><span class=\"keyword\">[关键词3C]</span></div><div class=\"topic-mentions\"><i class=\"fas fa-bullhorn\"></i> 提及次数: [数量3]</div></div><i class=\"fas fa-comments card-icon\"></i></div></div><div class=\"mindmap-card-container card\"><div class=\"mindmap-card\"><h2><i class=\"fas fa-sitemap\"></i> 核心概念关系图</h2><div class=\"mindmap-controls\"><button id=\"zoomInBtn\"><i class=\"fas fa-search-plus\"></i> 放大</button><button id=\"zoomOutBtn\"><i class=\"fas fa-search-minus\"></i> 缩小</button><button id=\"downloadDiagramBtn\"><i class=\"fas fa-download\"></i> 下载导图</button><button id=\"fullscreenOpenBtn\" class=\"fullscreen-toggle-btn\"><i class=\"fas fa-expand\"></i> 全屏</button></div><div class=\"mermaid-container\" id=\"mainMermaidContainer\"><div class=\"mermaid\" id=\"mindmapDiagram\">                            mindmap                                root((中心主题))                                    (点击下方按钮或在全屏模式下编辑内容)</div></div><div id=\"mermaid-main-feedback-message\"></div><i class=\"fas fa-project-diagram card-icon\"></i></div></div><div class=\"card quote-card\"><h2 contenteditable=\"false\"><i class=\"fas fa-quote-left\"></i> 精彩引用</h2><div class=\"quote\">                    \"[引言1内容。使其具有影响力或代表性。]\"<div class=\"quote-author\">- @[发言人1]</div></div><div class=\"quote\">                    \"[引言2内容。]\"<div class=\"quote-author\">- @[发言人2]</div></div><div class=\"quote\">                    \"[引言3内容。]\"<div class=\"quote-author\">- @[发言人3]</div></div><i class=\"fas fa-comment-dots card-icon\"></i></div><div class=\"card links-card\"><h2 contenteditable=\"false\"><i class=\"fas fa-link\"></i> 重要链接与资源</h2><div class=\"link-item\"><a href=\"[URL链接1]\" target=\"_blank\"><i class=\"fas fa-external-link-alt link-icon\"></i><span class=\"link-title\">[链接1标题]</span></a></div><div class=\"link-item\"><a href=\"[URL链接2]\" target=\"_blank\"><i class=\"fas fa-external-link-alt link-icon\"></i><span class=\"link-title\">[链接2标题]</span></a></div><div class=\"link-item\"><i class=\"fas fa-file link-icon\"></i><span class=\"link-title\">[文档1标题 - 例如：共享提示词V5]</span></div><i class=\"fas fa-share-alt card-icon\"></i></div><div class=\"card stats-card\"><h2 contenteditable=\"false\"><i class=\"fas fa-chart-line\"></i> 活跃之星</h2><table class=\"user-stats-table\"><thead><tr><th class=\"user-name-col\">用户</th><th class=\"message-count-col\">发言数</th><th class=\"contribution-col\">主要贡献</th></tr></thead><tbody><tr><td data-label=\"用户\" class=\"user-name-col\">@发言人1</td><td data-label=\"发言数\" class=\"message-count-col\">[数量1]+</td><td data-label=\"主要贡献\" class=\"contribution-col\">[用户1的主要贡献内容 - 例如：分享 PageTalk 插件和万能 Prompt 生成器]</td></tr><tr><td data-label=\"用户\" class=\"user-name-col\">@发言人2</td><td data-label=\"发言数\" class=\"message-count-col\">[数量2]+</td><td data-label=\"主要贡献\" class=\"contribution-col\">[用户2的主要贡献内容 - 例如：PageTalk 插件开发者，分享使用体验]</td></tr><tr><td data-label=\"用户\" class=\"user-name-col\">@发言人3</td><td data-label=\"发言数\" class=\"message-count-col\">[数量3]+</td><td data-label=\"主要贡献\" class=\"contribution-col\">[用户3的主要贡献内容 - 例如：参与 Agent 讨论和工具测试]</td></tr></tbody></table><i class=\"fas fa-user-friends card-icon\"></i></div><div class=\"card wordcloud-card\"><h2 contenteditable=\"false\"><i class=\"fas fa-cloud\"></i> 词云</h2><div class=\"wordcloud\"><span class=\"wordcloud-item size-5\">[关键词A]</span><span class=\"wordcloud-item size-5\">[关键词B]</span><span class=\"wordcloud-item size-4\">[关键词C]</span><span class=\"wordcloud-item size-4\">[关键词D]</span><span class=\"wordcloud-item size-3\">[关键词E]</span><span class=\"wordcloud-item size-3\">[关键词F]</span><span class=\"wordcloud-item size-2\">[关键词G]</span><span class=\"wordcloud-item size-2\">[关键词H]</span><span class=\"wordcloud-item size-1\">[关键词I]</span></div><i class=\"fas fa-tags card-icon\"></i></div></div><div class=\"footer\"><p>数据来源：[您的数据来源 - 例如：AI产品团聊天记录] | 生成日期：[生成日期] | 统计周期：[统计周期 - 例如：[日期]全天]</p><p>[免责声明 - 例如：本报告由AI自动生成，仅供参考，不代表所有群成员观点。]</p></div></div><div class=\"action-buttons-container\"><button id=\"viewPreviousReportBtn\" class=\"action-button\"><i class=\"fas fa-calendar-alt\"></i> 查看昨日日报</button><button id=\"screenshotToClipboardBtn\" class=\"action-button\"><i class=\"fas fa-clipboard\"></i> 拷贝截图</button><button id=\"screenshotDownloadBtn\" class=\"action-button\"><i class=\"fas fa-camera\"></i> 下载截图</button><button id=\"copyHtmlBtn\" class=\"action-button\"><i class=\"fas fa-copy\"></i> 拷贝源码</button><button id=\"downloadHtmlBtn\" class=\"action-button\"><i class=\"fas fa-download\"></i> 下载报告</button></div><div id=\"feedback-message\"></div><div id=\"fullscreenModal\" class=\"modal-overlay\"><div class=\"modal-content card\"><button id=\"fullscreenCloseBtn\" class=\"modal-close-btn\" aria-label=\"关闭全屏\">&times;</button><h2><i class=\"fas fa-sitemap\"></i> 核心概念关系图 (全屏)</h2><div class=\"mindmap-controls\"><button id=\"modalZoomInBtn\"><i class=\"fas fa-search-plus\"></i> 放大</button><button id=\"modalZoomOutBtn\"><i class=\"fas fa-search-minus\"></i> 缩小</button><button id=\"modalDownloadDiagramBtn\"><i class=\"fas fa-download\"></i> 下载导图</button></div><div class=\"mermaid-container\" id=\"modalMermaidContainer\"></div><div id=\"mermaid-modal-feedback-message\"></div></div></div><script>    // --- Mermaid Diagram JavaScript START ---    // --- Global Variables for Mermaid ---    let mainCurrentScale = 1;    let modalCurrentScale = 1;    let currentMindmapDefinition = ''; // Store the current definition    // --- DOM Elements for Mermaid ---    const mainZoomInBtn = document.getElementById('zoomInBtn');    const mainZoomOutBtn = document.getElementById('zoomOutBtn');    const mainDownloadDiagramBtn = document.getElementById('downloadDiagramBtn'); // Renamed from downloadBtn    const mainMermaidContainer = document.getElementById('mainMermaidContainer');    const mermaidMainFeedbackMessage = document.getElementById('mermaid-main-feedback-message'); // Renamed    const mainMindmapDiagramDiv = document.getElementById('mindmapDiagram');     const fullscreenOpenBtn = document.getElementById('fullscreenOpenBtn');    const fullscreenModal = document.getElementById('fullscreenModal');    const fullscreenCloseBtn = document.getElementById('fullscreenCloseBtn');    const modalMermaidContainer = document.getElementById('modalMermaidContainer');    const modalZoomInBtn = document.getElementById('modalZoomInBtn');    const modalZoomOutBtn = document.getElementById('modalZoomOutBtn');    const modalDownloadDiagramBtn = document.getElementById('modalDownloadDiagramBtn'); // Renamed    const mermaidModalFeedbackMessage = document.getElementById('mermaid-modal-feedback-message'); // Renamed    // --- Mermaid Initialization ---    if (typeof mermaid !== 'undefined') {        mermaid.initialize({            startOnLoad: false, // Will render manually after content is set            theme: 'base', // Options: 'default', 'forest', 'dark', 'neutral', 'base'            fontFamily: '\"Inter\", sans-serif',            mindmap: { padding: 15 }            // For other diagram types, you might add specific configs here            // e.g., sequence: { actorMargin: 50 }        });    } else {        console.error(\"Mermaid library not loaded.\");        if(mermaidMainFeedbackMessage) mermaidMainFeedbackMessage.textContent = \"错误：Mermaid库未能加载。\";    }        // --- Helper Functions for Mermaid ---    function showMermaidFeedback(element, message, type = 'info', duration = 3000) {        if (element) {            element.textContent = message;            element.className = type; // success, error, info            element.style.display = 'block';            setTimeout(() => {                element.textContent = '';                element.className = '';                element.style.display = 'none';            }, duration);        }    }    function applySvgScale(svgElement, scale) {        if (svgElement) {            svgElement.style.transform = `scale(${scale})`;            svgElement.style.transformOrigin = 'center center'; // Ensure scaling is from center        }    }    function makeDraggable(containerElement) {        let isDragging = false;        let startX, startY, scrollLeftStart, scrollTopStart;        if (!containerElement) return;        containerElement.addEventListener('mousedown', (e) => {            if (e.button !== 0) return; // Only main mouse button            // Prevent dragging if clicking on interactive elements within the SVG or buttons            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('[onclick]')) return;                        // Check if clicking on scrollbars (simple check, might need refinement)             if (e.target === containerElement) { // Only drag if mousedown is on container itself, not SVG content                const verticalScrollbarVisible = containerElement.scrollHeight > containerElement.clientHeight;                const horizontalScrollbarVisible = containerElement.scrollWidth > containerElement.clientWidth;                const clickedOnVerticalScrollbar = verticalScrollbarVisible && e.offsetX >= containerElement.clientWidth - 17; // Approx scrollbar width                const clickedOnHorizontalScrollbar = horizontalScrollbarVisible && e.offsetY >= containerElement.clientHeight - 17;                if (clickedOnVerticalScrollbar || clickedOnHorizontalScrollbar) return;            }            isDragging = true;            startX = e.pageX; startY = e.pageY;            scrollLeftStart = containerElement.scrollLeft; scrollTopStart = containerElement.scrollTop;            containerElement.classList.add('dragging');            // e.preventDefault(); // Be careful with preventDefault on container, might affect text selection inside SVG if not handled well        });        document.addEventListener('mousemove', (e) => {            if (!isDragging) return;            e.preventDefault(); // Prevent text selection during drag            const deltaX = e.pageX - startX; const deltaY = e.pageY - startY;            containerElement.scrollLeft = scrollLeftStart - deltaX;            containerElement.scrollTop = scrollTopStart - deltaY;        });        document.addEventListener('mouseup', (e) => {            if (e.button !== 0 || !isDragging) return;            isDragging = false;            containerElement.classList.remove('dragging');        });         // Touch events for dragging on mobile        containerElement.addEventListener('touchstart', (e) => {            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('[onclick]')) return;            if (e.touches.length === 1) {                isDragging = true;                const touch = e.touches[0];                startX = touch.pageX;                startY = touch.pageY;                scrollLeftStart = containerElement.scrollLeft;                scrollTopStart = containerElement.scrollTop;                containerElement.classList.add('dragging');            }        }, { passive: true }); // Use passive true if not calling preventDefault        document.addEventListener('touchmove', (e) => {            if (!isDragging || e.touches.length !== 1) return;            // e.preventDefault(); // To prevent page scroll if dragging content            const touch = e.touches[0];            const deltaX = touch.pageX - startX;            const deltaY = touch.pageY - startY;            containerElement.scrollLeft = scrollLeftStart - deltaX;            containerElement.scrollTop = scrollTopStart - deltaY;        }); // Set passive: false if e.preventDefault() is used        document.addEventListener('touchend', (e) => {            if (!isDragging) return;            isDragging = false;            containerElement.classList.remove('dragging');        });    }        async function downloadMermaidAsSVG(svgElement, baseFilename, feedbackElem) {        if (svgElement && svgElement.innerHTML.trim() !== \"\") {            try {                // Apply current scale to the SVG for download if desired, or download at 100%                // For simplicity, we download the SVG as it is currently rendered (potentially scaled in view, but SVG itself is 100%)                const svgData = new XMLSerializer().serializeToString(svgElement);                const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });                const url = URL.createObjectURL(blob);                const link = document.createElement('a');                link.href = url;                link.download = `${baseFilename}.svg`;                document.body.appendChild(link);                link.click();                document.body.removeChild(link);                URL.revokeObjectURL(url);                showMermaidFeedback(feedbackElem, `${baseFilename}.svg 已下载!`, 'success');            } catch (error) {                console.error(`Error during SVG download for ${baseFilename}:`, error);                showMermaidFeedback(feedbackElem, `下载 ${baseFilename}.svg 失败: ${error.message}`, 'error');            }        } else {            showMermaidFeedback(feedbackElem, '无法下载：图表内容为空。', 'error');        }    }    async function renderDiagram(definition, targetContainer, scaleVariableRef, feedbackElem, uniqueSvgId) {        if (!targetContainer) {            console.error(\"Target container for Mermaid diagram not found.\");            return null;        }        targetContainer.innerHTML = '<p style=\"text-align:center; padding:20px;\">图表加载中...</p>';        targetContainer.classList.remove('empty');        if (!definition || definition.trim() === \"\" || definition.trim().toLowerCase() === \"mindmap\") {            targetContainer.innerHTML = '';             targetContainer.classList.add('empty');             return null;        }                currentMindmapDefinition = definition; // Store the definition for fullscreen toggle        try {            if (typeof mermaid === 'undefined') throw new Error(\"Mermaid library is not available.\");            const {svg, bindFunctions} = await mermaid.render(uniqueSvgId, definition);            targetContainer.innerHTML = svg;            if (bindFunctions) bindFunctions(targetContainer);            const svgElement = targetContainer.querySelector('svg');            if (svgElement) {                // Reset scale to 1 initially for the new render                if (targetContainer === mainMermaidContainer) mainCurrentScale = 1;                else if (targetContainer === modalMermaidContainer) modalCurrentScale = 1;                                applySvgScale(svgElement, scaleVariableRef.value); // Apply current scale (which should be 1 after reset)                makeDraggable(targetContainer); // Make the container draggable                return svgElement;            } else {                targetContainer.innerHTML = '';                targetContainer.classList.add('empty');                showMermaidFeedback(feedbackElem, '图表生成了，但未找到SVG内容。', 'error');                return null;            }        } catch (error) {            console.error(\"Error rendering Mermaid:\", error);            targetContainer.innerHTML = `<p style=\"color:red; text-align:center; padding:20px;\">渲染图表时出错: ${error.message}</p>`;            showMermaidFeedback(feedbackElem, `渲染图表时出错: ${error.message}`, 'error', 5000);            return null;        }    }    // --- Main Mindmap Logic ---    if(mainZoomInBtn) mainZoomInBtn.addEventListener('click', () => {        mainCurrentScale += 0.1;        const svg = mainMermaidContainer.querySelector('svg');        applySvgScale(svg, mainCurrentScale);    });    if(mainZoomOutBtn) mainZoomOutBtn.addEventListener('click', () => {        if (mainCurrentScale > 0.2) { // Prevent scaling too small            mainCurrentScale -= 0.1;            const svg = mainMermaidContainer.querySelector('svg');            applySvgScale(svg, mainCurrentScale);        }    });    if(mainDownloadDiagramBtn) mainDownloadDiagramBtn.addEventListener('click', () => {        const svg = mainMermaidContainer.querySelector('svg');        downloadMermaidAsSVG(svg, '核心概念关系图', mermaidMainFeedbackMessage);    });    // --- Fullscreen Modal Logic for Mermaid ---    if(fullscreenOpenBtn) fullscreenOpenBtn.addEventListener('click', async () => {        if (!currentMindmapDefinition || currentMindmapDefinition.trim() === \"\" || currentMindmapDefinition.trim().toLowerCase() === \"mindmap\") {             showMermaidFeedback(mermaidMainFeedbackMessage, '请先生成一个有效的导图才能全屏查看。', 'info');             return;        }        if(fullscreenModal) fullscreenModal.classList.add('active');        document.body.classList.add('modal-active');        modalCurrentScale = mainCurrentScale; // Sync scale from main view or reset        await renderDiagram(currentMindmapDefinition, modalMermaidContainer, {value: modalCurrentScale}, mermaidModalFeedbackMessage, 'modalGeneratedSvgId');    });    if(fullscreenCloseBtn) fullscreenCloseBtn.addEventListener('click', () => {        if(fullscreenModal) fullscreenModal.classList.remove('active');        document.body.classList.remove('modal-active');        if(modalMermaidContainer) {            modalMermaidContainer.innerHTML = '';             modalMermaidContainer.classList.add('empty');        }    });    if(modalZoomInBtn) modalZoomInBtn.addEventListener('click', () => {        modalCurrentScale += 0.1;        const svg = modalMermaidContainer.querySelector('svg');        applySvgScale(svg, modalCurrentScale);    });    if(modalZoomOutBtn) modalZoomOutBtn.addEventListener('click', () => {        if (modalCurrentScale > 0.2) {            modalCurrentScale -= 0.1;            const svg = modalMermaidContainer.querySelector('svg');            applySvgScale(svg, modalCurrentScale);        }    });    if(modalDownloadDiagramBtn) modalDownloadDiagramBtn.addEventListener('click', () => {        const svg = modalMermaidContainer.querySelector('svg');        downloadMermaidAsSVG(svg, '核心概念关系图-全屏', mermaidModalFeedbackMessage);    });    // --- Initial Setup for Mermaid ---    async function initializeMainDiagram() {        if (mainMindmapDiagramDiv && mainMermaidContainer) {            const initialDefinition = mainMindmapDiagramDiv.textContent.trim();            if (initialDefinition) {                await renderDiagram(initialDefinition, mainMermaidContainer, { value: mainCurrentScale }, mermaidMainFeedbackMessage, 'initialMainDiagramSvg');            } else {                mainMermaidContainer.classList.add('empty'); // Ensure it's marked empty if no initial content            }        } else {             if(mermaidMainFeedbackMessage && !mainMermaidContainer) showMermaidFeedback(mermaidMainFeedbackMessage, '错误：导图容器未找到。', 'error');        }    }    // --- Mermaid Diagram JavaScript END ---    // --- Report Page JavaScript START ---    // Helper function: Get CSS variable value    function getCssVariable(variableName, defaultValue = null) {        const value = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();        return value || defaultValue;    }    function getWebpageNameForFilename() {        const pageTitleTag = document.querySelector('title');        let baseName = 'AI产品日报';         if (pageTitleTag && pageTitleTag.textContent) {            const fullTitle = pageTitleTag.textContent.trim();            const titleParts = fullTitle.split(' - ');             if (titleParts.length > 0 && titleParts[0].trim() !== \"\" && titleParts[0].trim() !== \"[在此处填写报告标题]\") {                baseName = titleParts[0].trim();             }        }        return baseName;    }    function getDateStringForFilename() {        const reportDateElement = document.querySelector('.main-card .date');        let dateStr = \"未指定日期\";         if (reportDateElement && reportDateElement.textContent) {            const dateContent = reportDateElement.textContent.trim();            if (dateContent && dateContent !== \"[日期 - 例如：2025年5月19日]\") {                 dateStr = dateContent;            }        }        return dateStr;    }        function sanitizeFilename(filename) {        return filename.replace(/[^a-z0-9\\u4e00-\\u9fa5_\\-\\.\\(\\)\\[\\]]/gi, '_').replace(/_+/g, '_');    }    const previousReportUrl = \"在此处填写昨日日报的URL\";     function showReportFeedbackMessage(message, type = 'info', duration = 3000) { // Renamed to avoid conflict        const feedbackElement = document.getElementById('feedback-message'); // This is the report's general feedback        if (feedbackElement) {            feedbackElement.textContent = message;            feedbackElement.className = type;             setTimeout(() => {                feedbackElement.textContent = '';                feedbackElement.className = '';            }, duration);        }    }        async function captureScreenshot(elementToCapture) {        await document.fonts.ready;         return html2canvas(elementToCapture, {             useCORS: true,             scale: window.devicePixelRatio || 1,             logging: false,             backgroundColor: getCssVariable('--bg-primary', '#f5f4ee'),             scrollX: -window.scrollX,             scrollY: -window.scrollY,            windowWidth: document.documentElement.scrollWidth,            windowHeight: document.documentElement.scrollHeight,            onclone: function(clonedDoc) {                const highlightElements = clonedDoc.querySelectorAll('.highlight-keyword');                highlightElements.forEach(el => {                    el.style.display = 'inline';                    el.style.padding = '1px 2px';                    el.style.lineHeight = '1.2';                    el.style.boxDecorationBreak = 'clone';                    el.style.webkitBoxDecorationBreak = 'clone';                });            }        });    }    const screenshotToClipboardBtn = document.getElementById('screenshotToClipboardBtn');    if(screenshotToClipboardBtn) screenshotToClipboardBtn.addEventListener('click', async function() {        const reportContent = document.getElementById('report-content-wrapper');        if (!reportContent) {            showReportFeedbackMessage('截图错误: 未找到报告内容。', 'error');            return;        }        const actionButtons = document.querySelector('.action-buttons-container');        const feedbackMsgElement = document.getElementById('feedback-message');        const originalButtonText = this.innerHTML;        this.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> 处理中...';        this.disabled = true;        if(actionButtons) actionButtons.style.visibility = 'hidden';         if(feedbackMsgElement) feedbackMsgElement.style.visibility = 'hidden';        try {            const canvas = await captureScreenshot(reportContent);            canvas.toBlob(async function(blob) {                if (blob) {                    try {                        if (navigator.clipboard && navigator.clipboard.write) {                            await navigator.clipboard.write([                                new ClipboardItem({ 'image/png': blob })                            ]);                            showReportFeedbackMessage('截图已拷贝到剪贴板!', 'success');                        } else {                            showReportFeedbackMessage('截图已生成，但您的浏览器不支持直接拷贝图片。请尝试下载截图。', 'error', 5000);                        }                    } catch (copyError) {                        console.error('拷贝到剪贴板失败:', copyError);                        showReportFeedbackMessage('拷贝截图到剪贴板失败: ' + copyError.message, 'error', 5000);                    }                } else {                    throw new Error('无法将Canvas转换为Blob。');                }            }, 'image/png');        } catch (error) {            console.error('截图捕获失败:', error);            showReportFeedbackMessage('截图捕获失败: ' + error.message, 'error');        } finally {            if(actionButtons) actionButtons.style.visibility = 'visible';             if(feedbackMsgElement) feedbackMsgElement.style.visibility = 'visible';             this.innerHTML = originalButtonText;            this.disabled = false;        }    });    const screenshotDownloadBtn = document.getElementById('screenshotDownloadBtn');    if(screenshotDownloadBtn) screenshotDownloadBtn.addEventListener('click', async function() {        const reportContent = document.getElementById('report-content-wrapper');        if (!reportContent) {            showReportFeedbackMessage('截图错误: 未找到报告内容。', 'error');            return;        }        const actionButtons = document.querySelector('.action-buttons-container');        const feedbackMsgElement = document.getElementById('feedback-message');        const originalButtonText = this.innerHTML;        this.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> 生成中...';        this.disabled = true;        if(actionButtons) actionButtons.style.visibility = 'hidden';        if(feedbackMsgElement) feedbackMsgElement.style.visibility = 'hidden';        try {            const canvas = await captureScreenshot(reportContent);            const image = canvas.toDataURL('image/png');            const link = document.createElement('a');                        const webpageName = getWebpageNameForFilename();            const dateString = getDateStringForFilename();            let filename = sanitizeFilename(webpageName + '-' + dateString) + '.png';            link.href = image;            link.download = filename;            document.body.appendChild(link);            link.click();            document.body.removeChild(link);            showReportFeedbackMessage('截图已下载!', 'success');        } catch (error) {            console.error('下载截图失败:', error);            showReportFeedbackMessage('下载截图失败: ' + error.message, 'error');        } finally {            if(actionButtons) actionButtons.style.visibility = 'visible';            if(feedbackMsgElement) feedbackMsgElement.style.visibility = 'visible';            this.innerHTML = originalButtonText;            this.disabled = false;        }    });        const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');    if(downloadHtmlBtn) downloadHtmlBtn.addEventListener('click', function() {        try {            const htmlContent = document.documentElement.outerHTML;            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });            const link = document.createElement('a');                        const webpageName = getWebpageNameForFilename();            const dateString = getDateStringForFilename();            let filename = sanitizeFilename(webpageName + '-' + dateString) + '.html';                        link.href = URL.createObjectURL(blob);            link.download = filename;            document.body.appendChild(link);            link.click();            document.body.removeChild(link);            URL.revokeObjectURL(link.href);             showReportFeedbackMessage('HTML报告已下载!', 'success');        } catch (error) {            console.error('下载HTML失败:', error);            showReportFeedbackMessage('下载HTML失败: ' + error.message, 'error');        }    });    const copyHtmlBtn = document.getElementById('copyHtmlBtn');    if(copyHtmlBtn) copyHtmlBtn.addEventListener('click', function() {        const htmlContent = document.documentElement.outerHTML;        const Gthis = this;         const originalButtonHTML = Gthis.innerHTML;         const textarea = document.createElement('textarea');        textarea.value = htmlContent;        textarea.style.position = 'fixed';         textarea.style.top = '-9999px';         textarea.style.left = '-9999px';        document.body.appendChild(textarea);        try {            textarea.select();            textarea.setSelectionRange(0, textarea.value.length);             if (document.execCommand('copy')) {                Gthis.innerHTML = '<i class=\"fas fa-check\"></i> 已拷贝!';                showReportFeedbackMessage('HTML已拷贝到剪贴板!', 'success', 2000);            } else {                Gthis.innerHTML = '<i class=\"fas fa-times\"></i> 拷贝失败';                showReportFeedbackMessage('拷贝失败。您的浏览器可能不支持此操作。', 'error', 2000);            }        } catch (err) {            Gthis.innerHTML = '<i class=\"fas fa-times\"></i> 拷贝出错';            showReportFeedbackMessage('拷贝出错: ' + err.message, 'error', 2000);            console.error('拷贝HTML源码出错:', err);        } finally {            setTimeout(function() {                 Gthis.innerHTML = originalButtonHTML;             }, 2000);            document.body.removeChild(textarea);        }    });    const viewPreviousReportBtn = document.getElementById('viewPreviousReportBtn');    if(viewPreviousReportBtn) viewPreviousReportBtn.addEventListener('click', function() {        const urlToOpen = previousReportUrl.trim();        const placeholderUrlText = \"在此处填写昨日日报的URL\";         if (urlToOpen && urlToOpen !== placeholderUrlText && (urlToOpen.startsWith('http://') || urlToOpen.startsWith('https://') || !urlToOpen.includes('://'))) {            let finalUrl = urlToOpen;            // Basic check if it's a relative path, might need more robust logic depending on deployment            // if (!urlToOpen.startsWith('http://') && !urlToOpen.startsWith('https://')) {            // finalUrl = window.location.origin + (urlToOpen.startsWith('/') ? '' : '/') + urlToOpen;            // }            const newWindow = window.open(finalUrl, '_blank');             if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {                showReportFeedbackMessage('无法打开新窗口。请检查您的弹出窗口拦截设置。', 'error', 5000);            }        } else {            showReportFeedbackMessage('昨日日报的URL未配置或无效。请检查脚本中的 previousReportUrl 变量，并确保它是一个有效的网址或相对路径。', 'error', 5000);        }    });    function adjustActionButtonsLayout() {        const actionButtonsContainer = document.querySelector('.action-buttons-container');        if (actionButtonsContainer) {            if (window.innerWidth<= 768) {                 actionButtonsContainer.style.display = 'flex';                actionButtonsContainer.style.flexWrap = 'wrap';                actionButtonsContainer.style.justifyContent = 'center';            } else {                 actionButtonsContainer.style.display = 'block';                 actionButtonsContainer.style.flexWrap = 'nowrap';             }        }    }        // --- Event Listeners Call on Load ---    window.addEventListener('load', () => {        initializeMainDiagram(); // Initialize Mermaid diagram        adjustActionButtonsLayout(); // Adjust report buttons layout    });    window.addEventListener('resize', adjustActionButtonsLayout); // Adjust on resize as well    // --- Report Page JavaScript END ---</script></body></html>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        -940
+      ],
+      "id": "5c437ca3-aad3-4657-9041-049f4ca6e81e",
+      "name": "配置群聊参数"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "filter-enabled",
+              "name": "enabled_groups",
+              "value": "={{ $json.groups.filter(group => group.enabled === true) }}",
+              "type": "array"
+            },
+            {
+              "id": "total-count",
+              "name": "total_groups",
+              "value": "={{ $json.groups.filter(group => group.enabled === true).length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        -940
+      ],
+      "id": "b13685b7-45a6-4225-9b1f-95664459d7fe",
+      "name": "筛选启用群组"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "split-groups",
+              "name": "group_data",
+              "value": "={{ $json.enabled_groups.map(group => ({\n  group_name: group.group_name,\n  group_owner: group.group_owner,\n  description: group.description,\n  date: $('配置群聊参数').item.json.date,\n  web_style: $('配置群聊参数').item.json.web_style_template,\n  batch_id: $workflow.id + '-' + $execution.id,\n  timestamp: $now.toISO()\n})) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        920,
+        -940
+      ],
+      "id": "d2ce1767-5e3e-41fa-8dca-1620f18edb21",
+      "name": "准备子工作流数据"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "group_data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -940
+      ],
+      "id": "6001ad9c-1de0-471e-af84-4d6ee1e3775d",
+      "name": "分发群组数据"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        },
+        "workflowInputs": {
+          "value": {},
+          "schema": [],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "07259096-fa14-4fd5-9bf6-9957e86b4fbb",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1320,
+        -940
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "##  Main workflow loop",
+        "height": 360,
+        "width": 1740,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -1080
+      ],
+      "id": "77aaa65b-18f6-46da-8e3c-95398d14debf",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "66182122-e667-42b3-ae9a-3727d01b6fcb",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -460,
+        -460
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "validate-input",
+              "name": "group_name",
+              "value": "={{ $json.group_name || '未知群组' }}",
+              "type": "string"
+            },
+            {
+              "id": "validate-date",
+              "name": "date",
+              "value": "={{ $json.date || $now.minus({days: 1}).format('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "validate-style",
+              "name": "web_style",
+              "value": "={{ $json.web_style || 'minimalist' }}",
+              "type": "string"
+            },
+            {
+              "id": "batch-info",
+              "name": "batch_id",
+              "value": "={{ $json.batch_id }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "process_start_time",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "450a5c15-3481-4fe6-b789-ba25fd411993",
+              "name": "description",
+              "value": "={{ $json.description || '未知群组' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -200,
+        -460
+      ],
+      "id": "54730104-efb6-44b5-a70a-cb71541f4b75",
+      "name": "验证输入参数"
+    },
+    {
+      "parameters": {
+        "content": "## Chatlog MCP",
+        "width": 300,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -260
+      ],
+      "id": "47a3e205-647a-49ab-8486-95fabd57f89f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取AI Agent的输出\nlet aiOutput;\ntry {\n  // 首先检查输入数据结构\n  const inputData = $input.first().json;\n  console.log('Input data structure:', JSON.stringify(inputData, null, 2));\n  \n  // 尝试不同的数据结构路径\n  if (inputData.choices && inputData.choices[0] && inputData.choices[0].message) {\n    // OpenAI API 标准格式\n    aiOutput = inputData.choices[0].message.content;\n  } else if (inputData.message && inputData.message.content) {\n    // 简化的消息格式\n    aiOutput = inputData.message.content;\n  } else if (inputData.content) {\n    // 直接内容格式\n    aiOutput = inputData.content;\n  } else if (inputData.output) {\n    // 输出字段格式\n    aiOutput = inputData.output;\n  } else if (typeof inputData === 'string') {\n    // 纯字符串格式\n    aiOutput = inputData;\n  } else {\n    // 如果都找不到，尝试找到第一个字符串值\n    const findStringValue = (obj) => {\n      if (typeof obj === 'string') return obj;\n      if (Array.isArray(obj)) {\n        for (const item of obj) {\n          const result = findStringValue(item);\n          if (result) return result;\n        }\n      } else if (typeof obj === 'object' && obj !== null) {\n        for (const key in obj) {\n          const result = findStringValue(obj[key]);\n          if (result) return result;\n        }\n      }\n      return null;\n    };\n    \n    aiOutput = findStringValue(inputData);\n    \n    if (!aiOutput) {\n      throw new Error('无法在输入数据中找到AI输出内容');\n    }\n  }\n  \n  console.log('Found AI output:', aiOutput.substring(0, 200) + '...');\n  \n} catch (error) {\n  console.error('获取AI输出时出错:', error);\n  return [{\n    json: {\n      error: '无法获取AI输出: ' + error.message,\n      inputData: $input.first().json,\n      status: 'error'\n    }\n  }];\n}\n\n// 清理可能的markdown标记\nlet htmlContent = aiOutput;\nif (htmlContent.includes('```html')) {\n  htmlContent = htmlContent.replace(/```html\\n?/g, '').replace(/\\n?```/g, '');\n}\nif (htmlContent.includes('```')) {\n  htmlContent = htmlContent.replace(/```\\n?/g, '').replace(/\\n?```/g, '');\n}\n\n// 获取群聊名称和日期（从工作流输入或设置默认值）\nconst groupName = $('验证输入参数')?.item?.json?.group_name || 'unknown';\nconst batchId = $('验证输入参数').item.json.batch_id;\nconst date = $('验证输入参数')?.item?.json?.date || new Date().toISOString().split('T')[0];\n\nconsole.log('群聊信息:', { groupName, date });\n\n// 🔥 改进：智能HTML内容清理 - 保护图表和脚本内容\nconsole.log('开始HTML清理，原始长度:', htmlContent.length);\n\n// 智能清理HTML内容，保护重要的代码区域\nconst smartCleanHtmlForMCP = (html) => {\n  // 1. 首先保护重要的代码区域\n  const protectedSections = [];\n  let cleanedHtml = html;\n  \n  // 保护 script 标签内容（包括 mermaid, chart.js 等）\n  cleanedHtml = cleanedHtml.replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_SCRIPT_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 保护 style 标签内容\n  cleanedHtml = cleanedHtml.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_STYLE_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 保护 pre 标签内容（可能包含图表定义）\n  cleanedHtml = cleanedHtml.replace(/<pre[^>]*>[\\s\\S]*?<\\/pre>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_PRE_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 保护具有特殊class的div（如mermaid图表容器）\n  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=\"[^\"]*(?:mermaid|chart|graph|diagram)[^\"]*\"[^>]*>[\\s\\S]*?<\\/div>/gi, (match, offset) => {\n    const placeholder = `__PROTECTED_CHART_${protectedSections.length}__`;\n    protectedSections.push(match);\n    return placeholder;\n  });\n  \n  // 2. 对其余内容进行清理\n  cleanedHtml = cleanedHtml\n    // 只清理普通的换行符和制表符，但保留必要的格式\n    .replace(/[\\r]/g, '')           // 移除回车符\n    .replace(/\\n\\s*\\n/g, '\\n')      // 将多个换行合并为一个\n    .replace(/\\t/g, '  ')           // 将制表符转换为两个空格\n    // 清理HTML标签间的多余空格，但不影响文本内容\n    .replace(/>\\s+</g, '><')\n    // 清理行首行尾空格\n    .replace(/^\\s+|\\s+$/gm, '')\n    // 将多个连续空格合并，但保留单个换行\n    .replace(/ +/g, ' ');\n  \n  // 3. 恢复受保护的内容\n  protectedSections.forEach((section, index) => {\n    const scriptPlaceholder = `__PROTECTED_SCRIPT_${index}__`;\n    const stylePlaceholder = `__PROTECTED_STYLE_${index}__`;\n    const prePlaceholder = `__PROTECTED_PRE_${index}__`;\n    const chartPlaceholder = `__PROTECTED_CHART_${index}__`;\n    \n    cleanedHtml = cleanedHtml.replace(scriptPlaceholder, section);\n    cleanedHtml = cleanedHtml.replace(stylePlaceholder, section);\n    cleanedHtml = cleanedHtml.replace(prePlaceholder, section);\n    cleanedHtml = cleanedHtml.replace(chartPlaceholder, section);\n  });\n  \n  // 4. 最后只对JSON传输做必要的转义\n  return cleanedHtml\n    .replace(/\\\\/g, '\\\\\\\\')    // 转义反斜杠\n    .replace(/\"/g, '\\\\\"');     // 转义双引号\n};\n\n// 应用智能清理\nconst originalHtmlContent = htmlContent;\nhtmlContent = smartCleanHtmlForMCP(htmlContent);\n\nconsole.log('智能HTML清理完成');\nconsole.log('- 原始长度:', originalHtmlContent.length);\nconsole.log('- 清理后长度:', htmlContent.length);\nconsole.log('- 节省空间:', originalHtmlContent.length - htmlContent.length, 'bytes');\n\n// 检查是否包含图表相关内容\nconst hasCharts = originalHtmlContent.match(/(mermaid|chart\\.js|echarts|d3\\.js|plotly|canvas|svg)/i);\nif (hasCharts) {\n  console.log('✅ 检测到图表内容，已应用保护性清理');\n} else {\n  console.log('ℹ️ 未检测到图表内容');\n}\n\n// 验证HTML文档完整性\nif (!htmlContent.includes('<!DOCTYPE html>')) {\n  console.error('AI输出不是完整的HTML文档');\n  return [{\n    json: {\n      error: 'AI输出不是完整的HTML文档',\n      receivedContent: htmlContent.substring(0, 500),\n      status: 'error'\n    }\n  }];\n}\n\n// 额外的HTML内容验证\nconst validateHtml = (html) => {\n  const checks = {\n    hasDoctype: html.includes('<!DOCTYPE html>'),\n    hasHtmlTag: html.includes('<html') && html.includes('</html>'),\n    hasHeadTag: html.includes('<head') && html.includes('</head>'),\n    hasBodyTag: html.includes('<body') && html.includes('</body>'),\n    hasTitle: html.includes('<title'),\n    isNotEmpty: html.length > 100,\n    hasChartLibraries: /(?:mermaid|chart\\.js|echarts|d3\\.js|plotly)/i.test(html)\n  };\n  \n  const passed = Object.values(checks).filter(Boolean).length;\n  const total = Object.keys(checks).length;\n  \n  console.log('HTML验证结果:', checks);\n  console.log(`HTML质量评分: ${passed}/${total}`);\n  \n  return { checks, score: passed / total };\n};\n\nconst validation = validateHtml(htmlContent);\n\n// 生成文件名 - 使用群聊名称和日期\nconst filename = `群聊日报-${groupName}-${date}.html`;\nconst safeFilename = filename.replace(/[^a-z0-9\\u4e00-\\u9fa5_\\-\\.]/gi, '_');\n\nconsole.log('文件名生成:', { \n  original: filename, \n  safe: safeFilename,\n  groupName: groupName,\n  date: date \n});\n\n// 生成清理后的HTML用于MCP工具\nconst mcpReadyHtml = htmlContent;\n\n// 计算处理时长\nlet processDuration = null;\ntry {\n  const startTime = $('验证输入参数').item.json.process_start_time;\n  if (startTime) {\n    const startDate = new Date(startTime);\n    const endDate = new Date();\n    // 计算秒数差\n    processDuration = Math.round((endDate - startDate) / 1000);\n  }\n} catch (e) {\n  console.log('计算处理时长失败:', e.message);\n  processDuration = null;\n}\n\n\n// 返回处理结果 - 包含两个版本的HTML\nreturn [{\n  json: {\n    // 原始HTML（用于文件保存）\n    htmlContent: originalHtmlContent,\n    // 清理后的HTML（用于MCP工具调用）\n    mcpHtmlContent: mcpReadyHtml,\n    // 文件信息 - 使用群聊名称\n    filename: safeFilename,\n    originalFilename: filename,\n    groupName: groupName,\n    batchId: batchId,\n    date: date,\n    process_end_time: $now.toISO(),\n    process_duration: processDuration,\n    timestamp: new Date().toISOString(),\n    status: 'success',\n    // 统计信息\n    originalContentLength: originalHtmlContent.length,\n    cleanedContentLength: mcpReadyHtml.length,\n    compressionRatio: ((originalHtmlContent.length - mcpReadyHtml.length) / originalHtmlContent.length * 100).toFixed(2) + '%',\n    // HTML质量信息\n    htmlValidation: validation,\n    hasChartContent: hasCharts !== null,\n    // 调试信息\n    processingSteps: [\n      '✅ AI输出解析成功',\n      '✅ Markdown清理完成', \n      '✅ 智能HTML清理完成（保护图表）',\n      '✅ MCP格式优化完成',\n      `✅ HTML验证完成 (${(validation.score * 100).toFixed(1)}%)`,\n      `✅ 文件名生成完成: ${safeFilename}`\n    ]\n  },\n  binary: {\n    data: {\n      data: Buffer.from(originalHtmlContent, 'utf8').toString('base64'),\n      mimeType: 'text/html',\n      fileName: safeFilename,\n      fileExtension: 'html'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        -460
+      ],
+      "id": "c772ca8b-030f-4e45-9d77-f8bf51385879",
+      "name": "处理AI输出"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/tmp/{{ $json.filename }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -460
+      ],
+      "id": "5101c271-2d81-4e68-80f4-60719aebea2f",
+      "name": "保存HTML文件"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "final-result",
+              "name": "result",
+              "value": "={\n  group_name: \"{{ $('处理AI输出').item.json.groupName }}\",\n  date: \"{{ $('处理AI输出').item.json.date }}\",\n  batch_id: \"{{ $('处理AI输出').item.json.batchId }}\",\n  status: \"{{ $('处理AI输出').item.json.status }}\",\n  file_path: \"{{ '/tmp/' + $('处理AI输出').item.json.filename }}\",\n  filename: \"{{ $('处理AI输出').item.json.filename }}\",\n  content_length: \"{{ $('处理AI输出').item.json.originalContentLength }}\",\n  process_start_time: \"{{ $('验证输入参数').item.json.process_start_time }}\",\n  process_end_time: \"{{ $('处理AI输出').item.json.process_end_time }}\",\n  process_duration_seconds: \"{{ $('处理AI输出').item.json.process_duration }}\",\n  link: \"{{ $json.output.url }}\",  \n  error: \"{{ $('处理AI输出').item.json.error || null }}\"\n}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        -460
+      ],
+      "id": "84552a65-cb01-4026-8970-81c58ed318a1",
+      "name": "格式化返回结果"
+    },
+    {
+      "parameters": {
+        "content": "## Subworkflow",
+        "height": 800,
+        "width": 2520,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -680
+      ],
+      "id": "f709e4d2-d4ad-42f1-812a-4b946cd541e7",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('验证输入参数').item.json.batch_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        120,
+        -240
+      ],
+      "id": "c228c1df-898f-4d94-b87a-4ecb86796af4",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=搜索 {{ $('验证输入参数').item.json.group_name }} 群聊 {{ $('验证输入参数').item.json.date }} 记录，并生成完整的HTML格式日报\n\n群组: {{ $('验证输入参数').item.json.group_name }}\n日期: {{ $('验证输入参数').item.json.date }}\n样式模板: {{ $('验证输入参数').item.json.web_style }}\n批次ID: {{ $('验证输入参数').item.json.batch_id }}\n\n输出格式：完整的HTML文档代码",
+        "options": {
+          "systemMessage": "# 微信群聊日报生成器\n\n你是极具审美的前端设计大师和群聊分析专家，专门为群聊记录生成视觉引人入胜、布局紧凑无空隙、配色和谐统一、风格固定一致、适合截图分享的单页HTML日报。\n\n## 重要：工具使用要求\n- 你必须使用chatlog工具来获取聊天记录\n- 不能假设或模拟聊天数据\n- 每次任务都要先调用chatlog工具\n\n## 可用工具\n你有以下MCP工具可用：\n- **chatlog**: 获取历史聊天记录\n  - time: 时间范围（必需参数）\n  - talker: 对话方（群组或联系人名称）\n  - keyword: 搜索关键词（可选）\n  - sender: 指定发送者（可选）\n\n## 核心任务\n1. **使用chatlog工具获取指定的群聊记录**\n2. **详细分析群聊内容并提炼关键信息**\n3. **生成基于Bento Grid设计风格的单页HTML网站**\n\n## 工作流程（严格按顺序执行）\n1. **第一步：使用chatlog工具获取数据**\n   - 根据用户提供的群组名称和日期调用chatlog工具\n   - 必须等待获取到真实的聊天记录数据\n2. **第二步：分析获取的数据**\n   - 解析chatlog返回的聊天记录\n   - 提取关键信息和统计数据\n3. **第三步：生成HTML日报**\n   - 基于真实数据生成完整的HTML文档\n\n## 自动提取信息能力\n- 群名称：从聊天记录的系统通知或常见群聊信息中提取\n- 日期：使用聊天记录中最近的日期，或者默认使用今天的日期  \n- 时间范围：根据记录中的首条和末条消息时间确定\n- 支持多种聊天记录格式：[时间] 昵称：消息内容、时间 - 昵称：消息内容等\n\n## 日报内容结构（必须包含）\n### 群聊总结\n- 群聊内容概述\n- 消息数量、活跃人员数量、热点话题数量\n- 统计时间\n\n### 今日热点（3-4个主要话题）\n- 关键词提取\n- 消息数量统计\n- 关键词提及次数\n- 突出显示微信名\n\n### 核心概念关系图\n- 将核心内容生成Mermaid思维导图\n- 展示话题间逻辑关系\n\n### 精彩引用（3条代表性发言）\n- 突出显示微信名\n- 有影响力或代表性的发言\n\n### 重要链接与资源\n- 链接支持点击跳转\n- 整理分享的文档和工具\n\n### 活跃之星（按发言次数倒序）\n- 发言次数统计\n- 人员前加@标识\n- 主要贡献内容描述\n- 突出显示微信名\n\n### 词云\n- 高频关键词可视化\n- 按重要性分级显示\n\n## 设计风格要求\n采用**极简主义风格 (Minimalist)**：\n- 简约、留白、精确排版、无衬线字体、克制装饰\n- 白色背景，橘色字体作为强调色\n- 配色方案：\n  - 背景色：#f5f4ee（略暖的米白色）\n  - 卡片背景：#faf9f6\n  - 强调色：#ff8906（主要橙色）\n  - 文字色：#212529（主要文字）\n\n## 个人品牌信息\n在生成的HTML日报中必须包含以下品牌元素：\n\n### 1. 页面头部\n- 在标题区域添加\"由 林月半子聊AI 制作\"\n- 可以使用小字体或副标题形式\n\n### 2. 页面底部\n- 添加作者信息栏：\n  - 作者：林月半子聊AI\n  - 微信：cloud-native-101\n  - 公众号：林月半子的AI笔记\n  - 专业领域：AI工具与自动化解决方案\n- 技术支持信息：基于 n8n + ChatlogMCP + AI 构建\n\n### 3. 版权信息\n- © 2024 林月半子聊AI | 智能群聊分析工具\n- 本报告由AI自动生成，仅供参考\n\n## 处理原则\n- 客观分析，不添加主观判断\n- 保护用户隐私，适当处理敏感信息\n- 提取有价值的技术讨论内容\n- 忽略无意义的闲聊和大量系统消息\n- 除专业名词外，其他输出内容要求中文\n- 确保生成的日报具有参考价值\n\n## 输出要求\n必须输出完整的HTML文档，包含：\n1. 完整的HTML结构\n2. 内嵌CSS样式（基于提供的模板）\n3. JavaScript交互功能\n4. Mermaid图表支持\n5. 响应式设计\n6. Font Awesome图标\n7. 动画效果\n8. 个人品牌信息集成\n\n严格按照极简主义风格生成，确保每次输出的页面风格完全一致。\n\n## 重要提示\n当用户提供查询条件时，你必须：\n1. 首先使用chatlog工具获取相应的聊天记录\n2. 分析获取到的聊天数据\n3. 然后生成完整的HTML格式群聊日报\n\n## 注意事项\n- 如果没有获取到聊天记录，不要生成虚假内容\n- 必须基于chatlog工具返回的真实数据进行分析\n- 如果工具调用失败，请说明具体错误"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        60,
+        -460
+      ],
+      "id": "df13dfef-c80c-4df3-aff5-d2132904b52e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://host.lima.internal:5030/sse"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -220
+      ],
+      "id": "40be6076-780c-4828-b060-6d36ce25684d",
+      "name": "Chatlog MCP Client"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -240
+      ],
+      "id": "aaea206b-8e16-4a5a-9006-5b677aba5714",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VPhblWpwZNdpZljX",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        920,
+        -220
+      ],
+      "id": "87ed377a-3253-4509-acfe-23868935f86e",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VPhblWpwZNdpZljX",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## EdgeOne pages MCP",
+        "height": 220,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -280
+      ],
+      "id": "0c6a7714-3f4e-4332-8bca-28e4efab7ad4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Context\n- 今天是 {{ $now.format('dd LLL yyyy') }}。\n- 当前时间：{{ $now.format('hh:mm a') }} 。\n- 你是一个运行在 n8n 工作流中的 AI Agent，拥有部署网页的能力\n\n## Task\n使用 EdgeOne Pages MCP 工具，调用 deploy_html 来部署网页。\n\nHTML内容：\n{{ $('处理AI输出').item.json.mcpHtmlContent }}\n\n请严格按照以下格式调用工具：\n- 工具名：deploy_html  \n- 参数名：value\n- 参数值：上面的HTML内容\n\n立即执行部署并返回URL。",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        -460
+      ],
+      "id": "60cf3e22-226f-4865-9e4a-094528957c4f",
+      "name": "部署群聊网页"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"url\": \"访问链接\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        -220
+      ],
+      "id": "a8d2a28e-41c3-4409-a7cd-997d205a24c9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 收集和聚合所有子工作流的结果\nconst results = [];\nconst errors = [];\nconst links = [];\nlet totalDuration = 0;\nlet totalContentLength = 0;\n\n// 遍历所有输入项\nfor (const item of $input.all()) {\n  const data = item.json;\n  \n  // 提取结果数据\n  const result = {\n    group_name: data.group_name || data.result?.group_name || '未知群组',\n    date: data.date || data.result?.date || '',\n    status: data.status || data.result?.status || 'unknown',\n    batch_id: data.batch_id || data.result?.batch_id || '',\n    filename: data.filename || data.result?.filename || '',\n    file_path: data.file_path || data.result?.file_path || '',\n    content_length: parseInt(data.content_length || data.result?.content_length || 0),\n    process_duration: parseInt(data.process_duration_seconds || data.result?.process_duration_seconds || 0),\n    link: data.link || data.result?.link || '',\n    error: data.error || data.result?.error || null,\n    process_start_time: data.process_start_time || data.result?.process_start_time || '',\n    process_end_time: data.process_end_time || data.result?.process_end_time || ''\n  };\n  \n  results.push(result);\n  \n  // 收集错误\n  if (result.error && result.error.trim() !== '') {\n    errors.push({\n      group: result.group_name,\n      error: result.error,\n      batch_id: result.batch_id\n    });\n  }\n  \n  // 收集成功的链接\n  if (result.status === 'success' && result.link) {\n    links.push({\n      group: result.group_name,\n      link: result.link,\n      filename: result.filename\n    });\n  }\n  \n  // 累计统计\n  totalDuration += result.process_duration;\n  totalContentLength += result.content_length;\n}\n\n// 计算汇总统计\nconst successCount = results.filter(r => r.status === 'success').length;\nconst errorCount = results.filter(r => r.status === 'error' || (r.error && r.error.trim() !== '')).length;\nconst totalGroups = results.length;\n\n// 生成执行报告\nconst executionSummary = {\n  batch_info: {\n    batch_id: results[0]?.batch_id || 'unknown',\n    execution_date: results[0]?.date || new Date().toISOString().split('T')[0],\n    execution_time: new Date().toISOString(),\n    total_groups: totalGroups,\n    workflow_version: 'v1.0.0'\n  },\n  \n  statistics: {\n    success_count: successCount,\n    error_count: errorCount,\n    success_rate: totalGroups > 0 ? Math.round((successCount / totalGroups) * 100) : 0,\n    total_processing_duration_seconds: totalDuration,\n    average_processing_duration_seconds: totalGroups > 0 ? Math.round(totalDuration / totalGroups) : 0,\n    total_content_length: totalContentLength,\n    average_content_length: totalGroups > 0 ? Math.round(totalContentLength / totalGroups) : 0\n  },\n  \n  results: results,\n  \n  successful_reports: links,\n  \n  errors: errors,\n  \n  performance_analysis: {\n    fastest_group: results.reduce((min, r) => r.process_duration < min.process_duration ? r : min, results[0] || {}),\n    slowest_group: results.reduce((max, r) => r.process_duration > max.process_duration ? r : max, results[0] || {}),\n    largest_content: results.reduce((max, r) => r.content_length > max.content_length ? r : max, results[0] || {}),\n    smallest_content: results.reduce((min, r) => r.content_length < min.content_length ? r : min, results[0] || {})\n  }\n};\n\n// 返回聚合结果\nreturn [{\n  json: {\n    summary: executionSummary,\n    raw_results: results,\n    execution_metadata: {\n      processed_at: new Date().toISOString(),\n      total_items_processed: totalGroups,\n      aggregation_version: '1.0.0',\n      workflow_id: $workflow.id,\n      execution_id: $execution.id\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        -940
+      ],
+      "id": "cbc72059-2975-4833-865d-c774e00a4bb1",
+      "name": "聚合子工作流结果"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0cc2e19-9b14-472f-8a4b-600d61ef0b24",
+              "name": "notification_data",
+              "value": "={\n  \"title\": \"📊 微信群聊日报生成完成\",\n  \"links\": \"{{ $json.summary.successful_reports.map(r => r.group + ': ' + r.link).join('\\\\n') }}\"\n}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1780,
+        -940
+      ],
+      "id": "732425a6-e649-4486-8f2d-08dbd739fa3d",
+      "name": "生成执行报告"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        -220
+      ],
+      "id": "c554f389-3a66-44e7-b530-75686c80e0c2",
+      "name": "EdgeOne pages List Tools",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "kVwUUosSKOPM4osQ",
+          "name": "Edgeone pages MCP Client (STDIO) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "={{ $fromAI('tool') }}",
+        "toolParameters": "={{ $fromAI('Tool_Parameters', '', 'json') }}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -220
+      ],
+      "id": "dc0bfa54-62fc-446b-b435-75f8f6242a6c",
+      "name": "EdgeOne pages Execute Tool",
+      "credentials": {
+        "mcpClientApi": {
+          "id": "kVwUUosSKOPM4osQ",
+          "name": "Edgeone pages MCP Client (STDIO) account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-06-17T10:49:23.343+08:00",
+          "Readable date": "June 17th 2025, 10:49:23 am",
+          "Readable time": "10:49:23 am",
+          "Day of week": "Tuesday",
+          "Year": "2025",
+          "Month": "June",
+          "Day of month": "17",
+          "Hour": "10",
+          "Minute": "49",
+          "Second": "23",
+          "Timezone": "Asia/Shanghai (UTC+08:00)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "配置群聊参数",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "配置群聊参数": {
+      "main": [
+        [
+          {
+            "node": "筛选启用群组",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "筛选启用群组": {
+      "main": [
+        [
+          {
+            "node": "准备子工作流数据",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "准备子工作流数据": {
+      "main": [
+        [
+          {
+            "node": "分发群组数据",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "分发群组数据": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "验证输入参数",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "验证输入参数": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "处理AI输出": {
+      "main": [
+        [
+          {
+            "node": "保存HTML文件",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "保存HTML文件": {
+      "main": [
+        [
+          {
+            "node": "部署群聊网页",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "处理AI输出",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chatlog MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "聚合子工作流结果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "部署群聊网页",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "部署群聊网页": {
+      "main": [
+        [
+          {
+            "node": "格式化返回结果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "部署群聊网页",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "聚合子工作流结果": {
+      "main": [
+        [
+          {
+            "node": "生成执行报告",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EdgeOne pages List Tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "部署群聊网页",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EdgeOne pages Execute Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "部署群聊网页",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f9823d1c-182a-4191-84d3-f57fd9f3e7f9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
+  },
+  "id": "R3SzXDHoAZU7wFEp",
+  "tags": [
+    {
+      "createdAt": "2025-06-15T05:13:23.778Z",
+      "updatedAt": "2025-06-15T05:13:23.778Z",
+      "id": "TxpcANozg8BLkVgu",
+      "name": "微信自动化"
+    }
+  ]
+}
