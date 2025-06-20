@@ -68,7 +68,7 @@
     },
     {
       "parameters": {
-        "sseEndpoint": "http://host.lima.internal:5030/sse"
+        "sseEndpoint": "http://host.docker.internal:5030/sse"
       },
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1,
