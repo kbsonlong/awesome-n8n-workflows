@@ -1,0 +1,224 @@
+{
+  "name": "Chatlog Test",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -280,
+        -160
+      ],
+      "id": "9f77f91b-8213-4e87-97f7-cafd30b4da00",
+      "name": "When chat message received",
+      "webhookId": "08f63e73-eed9-4233-91a7-306308cfc963"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ \"Choose proper tool for user input:\" + $json.chatInput }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -160
+      ],
+      "id": "5365c6eb-f7d0-4497-b795-2b72b38bb981",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "## Chatlog MCP",
+        "height": 180,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        20
+      ],
+      "id": "acf8c57a-35b9-4a29-abbd-473bae677640",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        40
+      ],
+      "id": "c86d87a0-4f9e-460b-9996-05b9fd56fdba",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://host.docker.internal:5030/sse"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        460,
+        60
+      ],
+      "id": "6c5e547e-0821-496c-b575-536ebd4bfd51",
+      "name": "Chatlog MCP Client"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        40
+      ],
+      "id": "ba47bad6-cc86-40e4-8b27-ffaa8c087cfc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "VPhblWpwZNdpZljX",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        -420
+      ],
+      "id": "cd69844c-46b5-4f28-aad7-3fbd6201b461",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:5030/api/v1/chatlog",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "={\n  \"time\": \"{{$now.minus({days: 1}).toISODate()}}~{{$now.minus({days: 1}).toISODate()}}\",\n  \"talker\": \"58415787584@chatroom\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        -420
+      ],
+      "id": "2b95a095-81ce-4879-a6cf-6e1fcc922d2e",
+      "name": "Chatlog API Test ",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "content": "\n### 📋 基本信息\n- 工作流名称: Chatlog-MCP-Test\n- 版本: v0.1.0\n- 创建者: 林月半子聊AI\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n基于 ChatlogMCP 的微信群聊数据获取测试工具。用于验证 Chatlog MCP 连接通路和基础功能，确保能够正常调用 API 获取微信群聊记录，为后续完整工作流开发提供基础验证。\n\n### 配置说明\n1. 配置 Gemini 凭据",
+        "height": 1000,
+        "width": 1600,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -760
+      ],
+      "id": "3bd7fa68-89d6-4024-ae32-3d9bff08769e",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chatlog MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Chatlog API Test ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f52c9d10-9a46-4302-940e-344164913f2e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
+  },
+  "id": "u8ofkwEXZV6dX14d",
+  "tags": [
+    {
+      "createdAt": "2025-06-15T03:13:46.276Z",
+      "updatedAt": "2025-06-15T03:13:46.276Z",
+      "id": "3hYFXGNvsck7WyMn",
+      "name": "chatlog"
+    }
+  ]
+}
