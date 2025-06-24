@@ -16,6 +16,14 @@ Automatically analyze WeChat group chat records and generate beautiful HTML dail
 
 **Tech Stack**: n8n + ChatlogMCP + Google Gemini + EdgeOne Pages
 
+### 🧠 [RAG Knowledge Assistant](./workflows/rag-knowledge-assistant/)
+
+Build a local RAG system that transforms static documents into an intelligent conversational assistant, eliminating AI hallucinations with fact-based responses.
+
+**Key Features**: Document processing, semantic search, multi-format support, local deployment, privacy protection
+
+**Tech Stack**: n8n + Ollama + Qwen3-Embedding + Vector Store
+
 ## Contributing
 
 Contributions are welcome! Please ensure your submission includes:
