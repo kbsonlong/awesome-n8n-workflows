@@ -1,0 +1,254 @@
+{
+  "name": "Multi Language Translator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "translate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b99c378f-e2b2-4a0f-ac9a-2198c9159c6b",
+      "name": "翻译请求",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        720,
+        120
+      ],
+      "webhookId": "translate-complete"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemini-2.5-pro\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"你是专业的翻译助手。请将用户提供的文本翻译成常用语言。请用JSON格式返回翻译结果。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"请将 {{ $('翻译请求').item.json.body.text }}，翻译成 {{ $('翻译请求').item.json.body.target_languages.join(',') }}\"\n    }\n  ],\n  \"project_id\": \"{{ $json.project_id }}\"\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "abb91ddd-a096-4248-9ac5-f3e55839de50",
+      "name": "Gemini 翻译",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1220,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取数据\nconst geminiResponse = $input.all()[0].json;\nconst translationText = geminiResponse.choices[0].message.content;\nconst webhookData = $('翻译请求').all()[0].json;\n\n// 处理换行符\nconst cleanText = translationText.replace(/\\\\n/g, '\\n');\n\n// 修复：数据在 body 里面！\nconst requestBody = webhookData.body || webhookData;\nconst originalText = requestBody.text;\nconst originalLanguages = requestBody.target_languages || [];\n\nconsole.log(\"=== 修复后的数据获取 ===\");\nconsole.log(\"requestBody:\", requestBody);\nconsole.log(\"originalLanguages:\", originalLanguages);\n\n// 语言映射\nconst languageMapping = {\n  \"中文\": \"Chinese\", \"Chinese\": \"Chinese\",\n  \"日语\": \"Japanese\", \"日文\": \"Japanese\", \"Japanese\": \"Japanese\", \"日本語\": \"Japanese\",\n  \"韩语\": \"Korean\", \"韩文\": \"Korean\", \"Korean\": \"Korean\", \"한국어\": \"Korean\", \n  \"法语\": \"French\", \"法文\": \"French\", \"French\": \"French\", \"Français\": \"French\",\n  \"德语\": \"German\", \"德文\": \"German\", \"German\": \"German\", \"Deutsch\": \"German\",\n  \"英语\": \"English\", \"英文\": \"English\", \"English\": \"English\"\n};\n\n// 语言检测模式\nconst languagePatterns = {\n  \"Chinese\": [\"中文\", \"Chinese\"],\n  \"Japanese\": [\"日语\", \"日文\", \"Japanese\", \"日本語\"],\n  \"Korean\": [\"韩语\", \"韩文\", \"Korean\", \"한국어\"],\n  \"French\": [\"法语\", \"法文\", \"French\", \"Français\"], \n  \"German\": [\"德语\", \"德文\", \"German\", \"Deutsch\"],\n  \"English\": [\"英语\", \"英文\", \"English\"]\n};\n\n// 标准化语言名称\nfunction normalizeLanguages(inputLanguages) {\n  return inputLanguages.map(lang => {\n    return languageMapping[lang] || languageMapping[lang.toLowerCase()] || lang;\n  });\n}\n\n// 动态提取翻译\nfunction extractTranslationsDynamically(text, normalizedLanguages) {\n  const translations = {};\n  const lines = text.split('\\n');\n  \n  normalizedLanguages.forEach(targetLang => {\n    const patterns = languagePatterns[targetLang] || [targetLang];\n    \n    lines.forEach(line => {\n      const trimmedLine = line.trim();\n      \n      if (trimmedLine.includes(':**') && !translations[targetLang]) {\n        const hasLanguage = patterns.some(pattern => \n          trimmedLine.toLowerCase().includes(pattern.toLowerCase())\n        );\n        \n        if (hasLanguage) {\n          const afterColon = trimmedLine.split(':**')[1];\n          if (afterColon) {\n            translations[targetLang] = afterColon.trim();\n          }\n        }\n      }\n    });\n  });\n  \n  return translations;\n}\n\n// 处理语言标准化\nconst normalizedLanguages = normalizeLanguages(originalLanguages);\n\n// 提取翻译\nlet translations = extractTranslationsDynamically(cleanText, normalizedLanguages);\n\n// 构建返回结果\nconst result = {\n  success: true,\n  original_text: originalText,\n  requested_languages: normalizedLanguages,\n  translations: translations,\n  extracted_count: Object.keys(translations).length,\n  timestamp: new Date().toISOString(),\n  model_used: geminiResponse.model,\n  request_id: geminiResponse.id\n};\n\nreturn {\n  json: result\n};"
+      },
+      "id": "40492fc4-2a4b-40fb-934b-d31e94607d30",
+      "name": "格式化翻译结果",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "1c53fdd1-55e1-4dc7-a156-1fa597b357ee",
+      "name": "返回翻译结果",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        120
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "69b49d3c-1e17-4385-b179-8db11608153b",
+      "name": "错误处理",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": false,\n  \"error\": \"{{ $json.error?.message || 'Unknown error' }}\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\",\n  \"details\": \"Gemini CLI 服务可能暂时不可用，请稍后重试\"\n}",
+        "options": {}
+      },
+      "id": "5a96dd26-ddc9-43ca-a4d8-9e8afb5ad08a",
+      "name": "错误响应",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1300,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb469860-ec95-44aa-864d-4725ce567a65",
+              "name": "project_id",
+              "value": "YOUR_GOOGLE_CLOUD_PROJECT",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        980,
+        120
+      ],
+      "id": "6ce4924a-f945-42ae-b289-5aad3d0713b8",
+      "name": "设置 Google Cloud 项目ID"
+    },
+    {
+      "parameters": {
+        "content": "# 🌍 n8n + Gemini 智能翻译服务\n\n## 📋 基本信息\n- **工作流名称**: Smart Translate API \n- **版本**: v0.0.1\n- **创建者**: LQ\n- **微信**：cloud-native-101\n- **公众号**: 林月半子的AI笔记\n\n## 🎯 功能概述\n基于 Google Gemini API 构建的多语言翻译服务，通过 Webhook 接口提供实时翻译功能。支持中文、英语、日语、韩语、法语、德语等多种语言互译，返回结构化JSON格式的翻译结果。\n\n## 📊 配置说明\n### 1. 部署 Gemini CLI API\n```\npython main.py\n```\n### 2. 配置工作流\n- 替换 Google Cloud 项目ID\n- 目标语言可在“格式化翻译结果”节点自行扩展\n\n",
+        "height": 880,
+        "width": 1820,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -380
+      ],
+      "id": "38d5df8a-c18d-401e-acb9-a4792cc5dd70",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## API调用示例\n```bash\ncurl -X POST http://localhost:5678/webhook/translate \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"text\": \"Hello, how are you today?\",\n    \"target_languages\": [\"中文\", \"日语\", \"法语\"]\n  }'\n```\n\n## 响应格式\n\n```json\n{\n  \"success\": true,\n  \"original_text\": \"Hello, how are you today?\",\n  \"requested_languages\": [\"Chinese\", \"Japanese\", \"French\"],\n  \"translations\": {\n    \"Chinese\": \"你好，你今天怎么样？\",\n    \"Japanese\": \"こんにちは、今日はいかがですか？\",\n    \"French\": \"Bonjour, comment allez-vous aujourd'hui ?\"\n  },\n  \"extracted_count\": 3,\n  \"timestamp\": \"2024-01-15T10:30:00.000Z\",\n  \"model_used\": \"gemini-2.5-pro\",\n  \"request_id\": \"req_123456789\"\n}\n```",
+        "height": 880,
+        "width": 920,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        -380
+      ],
+      "id": "a29073e0-2eed-4cfb-a737-c3f8ccb8d976",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {
+    "翻译请求": [
+      {
+        "json": {
+          "headers": {
+            "host": "localhost:5678",
+            "user-agent": "curl/8.7.1",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "content-length": "110"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "Hello, how are you today?",
+            "target_languages": [
+              "中文",
+              "日语",
+              "法语"
+            ]
+          },
+          "webhookUrl": "http://localhost:5678/webhook/translate",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "翻译请求": {
+      "main": [
+        [
+          {
+            "node": "设置 Google Cloud 项目ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 翻译": {
+      "main": [
+        [
+          {
+            "node": "格式化翻译结果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "格式化翻译结果": {
+      "main": [
+        [
+          {
+            "node": "返回翻译结果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "错误处理": {
+      "main": [
+        [
+          {
+            "node": "错误响应",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "设置 Google Cloud 项目ID": {
+      "main": [
+        [
+          {
+            "node": "Gemini 翻译",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a67ff76a-0ab2-4105-8a80-72c65183d6cd",
+  "meta": {
+    "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
+  },
+  "id": "v8BWCDdLu9WpPZAq",
+  "tags": []
+}

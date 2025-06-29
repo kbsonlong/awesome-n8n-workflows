@@ -24,6 +24,14 @@ Build a local RAG system that transforms static documents into an intelligent co
 
 **Tech Stack**: n8n + Ollama + Qwen3-Embedding + Vector Store
 
+### 🌍 [Multi-Language Translator](./workflows/multi-language-translator/)
+
+AI-powered translation service with RESTful API interface, supporting real-time translation between 6 major languages with structured JSON responses.
+
+**Key Features**: Multi-language support, batch translation, error handling, structured responses, webhook integration
+
+**Tech Stack**: n8n + Google Gemini CLI + Webhook
+
 ## Contributing
 
 Contributions are welcome! Please ensure your submission includes:
