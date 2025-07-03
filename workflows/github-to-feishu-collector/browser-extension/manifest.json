@@ -5,8 +5,13 @@
   "description": "一键收集GitHub项目信息到飞书表格",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "contextMenus",
+    "scripting"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "收集GitHub项目"

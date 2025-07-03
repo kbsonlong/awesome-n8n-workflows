@@ -34,25 +34,39 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
 
-    // 检查当前标签页是否为GitHub
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      const currentTab = tabs[0];
-      
-      if (!currentTab.url.includes('github.com')) {
-        showStatus('请在GitHub页面使用此扩展', 'error');
-        return;
-      }
+    // 检查URL参数中是否包含tabId
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabId = urlParams.get('tabId');
 
-      // 检查是否在项目页面
-      const urlPattern = /^https:\/\/github\.com\/[^\/]+\/[^\/]+\/?$/;
-      if (!urlPattern.test(currentTab.url)) {
-        showStatus('请在GitHub项目主页使用此扩展', 'error');
-        return;
-      }
-
-      collectProject(currentTab.url, webhookUrl);
-    });
+    if (tabId) {
+      // 如果有tabId，则从指定的tab获取信息
+      chrome.tabs.get(parseInt(tabId), function(tab) {
+        handleTab(tab, webhookUrl);
+      });
+    } else {
+      // 否则，像原来一样获取当前激活的tab
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        handleTab(tabs[0], webhookUrl);
+      });
+    }
   });
+
+  // 处理标签页并收集项目
+  function handleTab(currentTab, webhookUrl) {
+    if (!currentTab.url.includes('github.com')) {
+      showStatus('请在GitHub页面使用此扩展', 'error');
+      return;
+    }
+
+    // 检查是否在项目页面
+    const urlPattern = /^https:\/\/github\.com\/[^\/]+\/[^\/]+\/?$/;
+    if (!urlPattern.test(currentTab.url)) {
+      showStatus('请在GitHub项目主页使用此扩展', 'error');
+      return;
+    }
+
+    collectProject(currentTab.url, webhookUrl);
+  }
 
   // 显示状态信息
   function showStatus(message, type) {
