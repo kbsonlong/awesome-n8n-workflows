@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG转PNG转换器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segue UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f6f8fa;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0366d6;
+            text-align: center;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .icon-card {
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        .icon-preview {
+            margin: 15px 0;
+        }
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .download-btn:hover {
+            background: #218838;
+        }
+        .convert-all {
+            background: #0366d6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px auto;
+            display: block;
+        }
+        .convert-all:hover {
+            background: #0256cc;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 SVG转PNG转换器</h1>
+        <p style="text-align: center; color: #666;">
+            将生成的SVG图标转换为PNG格式，用于Chrome扩展
+        </p>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="icon-grid">
+            <div class="icon-card">
+                <h3>16x16 图标</h3>
+                <div class="icon-preview">
+                    <canvas id="canvas16" width="16" height="16" style="border: 1px solid #ddd; width: 64px; height: 64px; image-rendering: pixelated;"></canvas>
+                </div>
+                <button class="download-btn" onclick="downloadPNG('canvas16', 'icon16.png')">下载 PNG</button>
+            </div>
+            
+            <div class="icon-card">
+                <h3>48x48 图标</h3>
+                <div class="icon-preview">
+                    <canvas id="canvas48" width="48" height="48" style="border: 1px solid #ddd; width: 96px; height: 96px;"></canvas>
+                </div>
+                <button class="download-btn" onclick="downloadPNG('canvas48', 'icon48.png')">下载 PNG</button>
+            </div>
+            
+            <div class="icon-card">
+                <h3>128x128 图标</h3>
+                <div class="icon-preview">
+                    <canvas id="canvas128" width="128" height="128" style="border: 1px solid #ddd; width: 128px; height: 128px;"></canvas>
+                </div>
+                <button class="download-btn" onclick="downloadPNG('canvas128', 'icon128.png')">下载 PNG</button>
+            </div>
+        </div>
+        
+        <button class="convert-all" onclick="convertAll()">📦 下载所有PNG图标</button>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f1f8ff; border-radius: 8px;">
+            <h3 style="color: #0366d6;">💡 使用说明</h3>
+            <ol>
+                <li>页面加载后会自动生成预览图标</li>
+                <li>点击单个"下载 PNG"按钮下载对应尺寸</li>
+                <li>或点击"下载所有PNG图标"一次性下载全部</li>
+                <li>将下载的PNG文件放到browser-extension目录中</li>
+                <li>替换manifest.json中引用的图标文件</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 图标SVG数据
+        const iconSVGs = {
+            16: `<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bgGrad16" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0366d6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0256cc;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="16" height="16" rx="2.4" fill="url(#bgGrad16)"/>
+                <rect x="1.6" y="1.6" width="12.8" height="12.8" rx="1.6" fill="#ffffff" opacity="0.95"/>
+                <rect x="3.2" y="3.2" width="5.6" height="5.6" rx="0.84" fill="#24292f"/>
+                <text x="6" y="7.2" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="1.28" font-weight="bold">GH</text>
+                <g stroke="#28a745" stroke-width="0.48" fill="none" stroke-linecap="round">
+                    <line x1="9.6" y1="6" x2="12" y2="6"/>
+                    <polyline points="11.04,5.36 12,6 11.04,6.64"/>
+                </g>
+                <rect x="7.2" y="3.2" width="5.6" height="5.6" rx="0.56" fill="#28a745"/>
+                <g stroke="#ffffff" stroke-width="0.24" opacity="0.9">
+                    <line x1="7.76" y1="4.6" x2="12.24" y2="4.6"/>
+                    <line x1="7.76" y1="6" x2="12.24" y2="6"/>
+                    <line x1="7.76" y1="7.4" x2="12.24" y2="7.4"/>
+                    <line x1="9.048" y1="3.76" x2="9.048" y2="8.24"/>
+                    <line x1="11.152" y1="3.76" x2="11.152" y2="8.24"/>
+                </g>
+            </svg>`,
+            
+            48: `<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bgGrad48" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0366d6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0256cc;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="48" height="48" rx="7.2" fill="url(#bgGrad48)"/>
+                <rect x="4.8" y="4.8" width="38.4" height="38.4" rx="4.8" fill="#ffffff" opacity="0.95"/>
+                <rect x="9.6" y="9.6" width="16.8" height="16.8" rx="2.52" fill="#24292f"/>
+                <text x="18" y="20.88" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="3.84" font-weight="bold">GH</text>
+                <g stroke="#28a745" stroke-width="1.44" fill="none" stroke-linecap="round">
+                    <line x1="28.8" y1="18" x2="36" y2="18"/>
+                    <polyline points="33.12,16.08 36,18 33.12,19.92"/>
+                </g>
+                <rect x="21.6" y="9.6" width="16.8" height="16.8" rx="1.68" fill="#28a745"/>
+                <g stroke="#ffffff" stroke-width="1" opacity="0.9">
+                    <line x1="23.28" y1="13.8" x2="36.72" y2="13.8"/>
+                    <line x1="23.28" y1="18" x2="36.72" y2="18"/>
+                    <line x1="23.28" y1="22.2" x2="36.72" y2="22.2"/>
+                    <line x1="27.144" y1="11.28" x2="27.144" y2="24.72"/>
+                    <line x1="32.688" y1="11.28" x2="32.688" y2="24.72"/>
+                </g>
+                <text x="24" y="38.4" text-anchor="middle" fill="#0366d6" font-family="Arial, sans-serif" font-size="3.84" font-weight="bold">收集器</text>
+            </svg>`,
+            
+            128: `<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bgGrad128" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0366d6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0256cc;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="128" height="128" rx="19.2" fill="url(#bgGrad128)"/>
+                <rect x="12.8" y="12.8" width="102.4" height="102.4" rx="12.8" fill="#ffffff" opacity="0.95"/>
+                <rect x="25.6" y="25.6" width="44.8" height="44.8" rx="6.72" fill="#24292f"/>
+                <text x="48" y="55.68" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10.24" font-weight="bold">GH</text>
+                <g stroke="#28a745" stroke-width="3.84" fill="none" stroke-linecap="round">
+                    <line x1="76.8" y1="48" x2="96" y2="48"/>
+                    <polyline points="88.32,42.88 96,48 88.32,53.12"/>
+                </g>
+                <rect x="57.6" y="25.6" width="44.8" height="44.8" rx="4.48" fill="#28a745"/>
+                <g stroke="#ffffff" stroke-width="2" opacity="0.9">
+                    <line x1="62.08" y1="36.8" x2="97.92" y2="36.8"/>
+                    <line x1="62.08" y1="48" x2="97.92" y2="48"/>
+                    <line x1="62.08" y1="59.2" x2="97.92" y2="59.2"/>
+                    <line x1="72.384" y1="30.08" x2="72.384" y2="65.92"/>
+                    <line x1="87.616" y1="30.08" x2="87.616" y2="65.92"/>
+                </g>
+                <text x="64" y="102.4" text-anchor="middle" fill="#0366d6" font-family="Arial, sans-serif" font-size="10.24" font-weight="bold">GitHub收集器</text>
+                <text x="64" y="115.2" text-anchor="middle" fill="#6a737d" font-family="Arial, sans-serif" font-size="6.4">一键收集到飞书表格</text>
+            </svg>`
+        };
+
+        // 将SVG转换为PNG并绘制到Canvas
+        function svgToPNG(svgString, canvas, callback) {
+            const img = new Image();
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+                if (callback) callback();
+            };
+            
+            img.onerror = function() {
+                console.error('Failed to load SVG');
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+
+        // 下载PNG文件
+        function downloadPNG(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            showStatus(`✅ ${filename} 下载成功`, 'success');
+        }
+
+        // 下载所有PNG文件
+        function convertAll() {
+            let downloadCount = 0;
+            const total = 3;
+            
+            showStatus('🔄 正在准备下载...', 'success');
+            
+            setTimeout(() => downloadPNG('canvas16', 'icon16.png'), 100);
+            setTimeout(() => downloadPNG('canvas48', 'icon48.png'), 300);
+            setTimeout(() => downloadPNG('canvas128', 'icon128.png'), 500);
+            
+            setTimeout(() => {
+                showStatus('🎉 所有PNG图标下载完成！', 'success');
+            }, 1000);
+        }
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            // 转换所有SVG到Canvas
+            svgToPNG(iconSVGs[16], document.getElementById('canvas16'));
+            svgToPNG(iconSVGs[48], document.getElementById('canvas48'));
+            svgToPNG(iconSVGs[128], document.getElementById('canvas128'));
+            
+            showStatus('✅ 图标预览加载完成', 'success');
+        };
+    </script>
+</body>
+</html>

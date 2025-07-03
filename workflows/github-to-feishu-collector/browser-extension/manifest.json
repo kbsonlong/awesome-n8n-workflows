@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub项目收集器",
+  "version": "1.0",
+  "description": "一键收集GitHub项目信息到飞书表格",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "收集GitHub项目"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://*.n8n.cloud/*",
+    "https://n8n.orb.local/*",
+    "http://localhost:5678/*"
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "name": "GitHub收集器书签创建助手",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-project-api",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b72c92cc-f3ca-4be9-8491-3ff11fe4e0c1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -220
+      ],
+      "webhookId": "github-project-collector"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 从GitHub URL提取仓库信息\nconst githubUrl = $input.first().json.body.github_url;\nconst repoMatch = githubUrl.match(/github\\.com\\/([^/]+)\\/([^/]+)/);\n\nif (!repoMatch) {\n  throw new Error('无效的GitHub URL');\n}\n\nconst owner = repoMatch[1];\nconst repo = repoMatch[2].replace(/\\.git$/, ''); // 移除.git后缀\n\nreturn {\n  github_url: githubUrl,\n  owner: owner,\n  repository: repo,\n  api_url: `https://api.github.com/repos/${owner}/${repo}`\n};"
+      },
+      "id": "f0917d83-8755-41ac-9d26-5abc96622702",
+      "name": "提取仓库信息",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.api_url}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-github-collector"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github.v3+json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "344de716-af87-4562-a606-03eff0d1b3e8",
+      "name": "调用GitHub API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 处理GitHub API响应\nconst apiData = $json;\nconst originalData = $('提取仓库信息').first().json;\n\n// 格式化数字\nconst formatNumber = (num) => {\n  if (num >= 1000000) {\n    return (num / 1000000).toFixed(1) + 'M';\n  } else if (num >= 1000) {\n    return (num / 1000).toFixed(1) + 'K';\n  }\n  return num.toString();\n};\n\n// 格式化日期\nconst formatDate = (dateStr) => {\n  if (!dateStr) return '';\n  return new Date(dateStr).toLocaleDateString('zh-CN');\n};\n\nreturn {\n  github_url: originalData.github_url,\n  title: apiData.name || '',\n  description: apiData.description || '',\n  owner: apiData.owner?.login || originalData.owner,\n  repository: apiData.name || originalData.repository,\n  language: apiData.language || '',\n  stars: formatNumber(apiData.stargazers_count || 0),\n  forks: formatNumber(apiData.forks_count || 0),\n  license: apiData.license?.name || '',\n  topics: apiData.topics ? apiData.topics.join(', ') : '',\n  created_at: formatDate(apiData.created_at),\n  updated_at: formatDate(apiData.updated_at),\n  collected_at: new Date().toISOString(),\n  full_name: apiData.full_name || `${originalData.owner}/${originalData.repository}`,\n  homepage: apiData.homepage || '',\n  is_private: apiData.private || false,\n  is_fork: apiData.fork || false,\n  default_branch: apiData.default_branch || 'main',\n  open_issues: apiData.open_issues_count || 0,\n  size: apiData.size || 0\n};"
+      },
+      "id": "35c3d537-f204-46e1-8e18-2c205a8e6f60",
+      "name": "处理API数据",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"success\": true,\n    \"message\": \"GitHub项目已成功添加到飞书表格\",\n    \"timestamp\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "d830d24b-a01c-48a8-bbc7-b5f4b3b09a5b",
+      "name": "返回响应",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "bitable",
+        "operation": "bitable:table:record:add",
+        "app_toke": "P20QbmrEma3jqfsIobdcf09DnCh",
+        "table_id": "tbl1MFo8l53moMge",
+        "body": "=  {\n    \"fields\": {\n      \"github_url\": \"{{ $json.github_url }}\",\n      \"title\": \"{{ $json.title }}\",\n      \"description\": \"{{ $json.description }}\",\n      \"owner\": \"{{ $json.owner }}\",\n      \"repository\": \"{{ $json.repository }}\",\n      \"language\": \"{{ $json.language }}\",\n      \"stars\": \"{{ $json.stars }}\",\n      \"forks\": \"{{ $json.forks }}\",\n      \"license\": \"{{ $json.license }}\",\n      \"topics\": \"{{ $json.topics }}\",\n      \"created_at\": \"{{ $json.created_at }}\",\n      \"updated_at\": \"{{ $json.updated_at }}\",\n      \"collected_at\": \"{{ $json.collected_at }}\",\n      \"full_name\": \"{{ $json.full_name }}\",\n      \"homepage\": \"{{ $json.homepage }}\",\n      \"is_private\": \"{{ $json.is_private }}\",\n      \"is_fork\": \"{{ $json.is_fork }}\",\n      \"default_branch\": \"{{ $json.default_branch }}\",\n      \"open_issues\": \"{{ $json.open_issues }}\",\n      \"size\": \"{{ $json.size }}\"\n    }\n  }"
+      },
+      "type": "n8n-nodes-feishu-lite.feishuNode",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        0
+      ],
+      "id": "5e7ccdea-142c-4fd9-bccc-9c9df0a4ff71",
+      "name": "同步飞书多维表格",
+      "credentials": {
+        "feishuCredentialsApi": {
+          "id": "L8ptT3ckLwYHTfXe",
+          "name": "Feishu Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## GitHub项目收集器\n###  📋 基本信息\n   - 工作流名称: github-to-feishu-collector\n   - 版本: v1.0\n   - 创建者: 林月半子聊AI\n   - 微信：cloud-native-101\n   - 公众号: 林月半子的AI笔记\n\n\n### 🎯 功能概述\n  通过浏览器扩展，一键收集任意GitHub项目信息并自动同步到飞书多维表格。该工作流利用GitHub官方API获取项目元数据（如Stars、Forks、语言等），确保数据准确、稳定，是搭建个人或团队GitHub项目知识库的利器。\n\n\n###  配置说明\n   1. 配置n8n工作流:\n      - 导入 github-to-feishu-workflow-api.json。\n      - 配置 \"同步飞书多维表格\" 节点，填入飞书API凭证、表格App Token和Table ID。\n      - 激活工作流并复制Webhook URL。\n   2. 配置浏览器扩展:\n      - 在Chrome中加载 browser-extension 文件夹。\n      - 在扩展配置中，粘贴并保存n8n Webhook URL。",
+        "height": 720,
+        "width": 1420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -540
+      ],
+      "id": "83ab08f1-975f-4c65-9e6a-fa94dcde3f2f",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "提取仓库信息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "提取仓库信息": {
+      "main": [
+        [
+          {
+            "node": "调用GitHub API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "调用GitHub API": {
+      "main": [
+        [
+          {
+            "node": "处理API数据",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "处理API数据": {
+      "main": [
+        [
+          {
+            "node": "同步飞书多维表格",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "同步飞书多维表格": {
+      "main": [
+        [
+          {
+            "node": "返回响应",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0e8a783a-82d2-449b-87a0-f858c562a8b5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
+  },
+  "id": "u6gVO8OHzEKJ2d0t",
+  "tags": []
+}

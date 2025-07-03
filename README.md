@@ -8,6 +8,14 @@
 
 ## Workflows
 
+### 📂 [GitHub to Feishu Collector](./workflows/github-to-feishu-collector/)
+
+One-click collection of GitHub project information to a Feishu Bitable using a browser extension.
+
+**Key Features**: Browser extension, one-click trigger, stable data via GitHub API, automatic sync to Feishu.
+
+**Tech Stack**: n8n + GitHub API + Feishu Bitable
+
 ### 💬 [WeChat AI Daily Report Generator](./workflows/wechat-daily-report/)
 
 Automatically analyze WeChat group chat records and generate beautiful HTML daily reports powered by AI.

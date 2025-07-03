@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 300px;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 12px;
+    }
+    .config {
+      margin-bottom: 20px;
+    }
+    .config label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .config input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .collect-btn {
+      width: 100%;
+      padding: 12px;
+      background: #0366d6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .collect-btn:hover {
+      background: #0256cc;
+    }
+    .collect-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .status {
+      text-align: center;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .loading {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    .project-info {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .project-info div {
+      margin-bottom: 5px;
+    }
+    .project-info strong {
+      color: #333;
+    }
+    .save-btn {
+      width: 100%;
+      padding: 8px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .save-btn:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🚀</div>
+    <div class="title">GitHub项目收集器</div>
+    <div class="subtitle">一键收集到飞书表格</div>
+  </div>
+
+  <div class="config">
+    <label for="webhook-url">n8n Webhook URL:</label>
+    <input type="text" id="webhook-url" placeholder="https://n8n.orb.local/webhook/github-project-api">
+    <button class="save-btn" id="save-config">保存配置</button>
+  </div>
+
+  <button class="collect-btn" id="collect-btn">
+    📋 收集当前项目
+  </button>
+
+  <div id="status" class="status" style="display: none;"></div>
+  <div id="project-info" class="project-info" style="display: none;"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

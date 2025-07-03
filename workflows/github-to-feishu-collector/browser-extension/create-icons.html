@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>生成扩展图标</title>
+</head>
+<body>
+    <h1>GitHub收集器 - 扩展图标生成器</h1>
+    
+    <!-- 16x16 图标 -->
+    <h3>16x16 图标</h3>
+    <canvas id="icon16" width="16" height="16" style="border: 1px solid #ccc; image-rendering: pixelated; width: 64px; height: 64px;"></canvas>
+    
+    <!-- 48x48 图标 -->
+    <h3>48x48 图标</h3>
+    <canvas id="icon48" width="48" height="48" style="border: 1px solid #ccc; width: 96px; height: 96px;"></canvas>
+    
+    <!-- 128x128 图标 -->
+    <h3>128x128 图标</h3>
+    <canvas id="icon128" width="128" height="128" style="border: 1px solid #ccc; width: 192px; height: 192px;"></canvas>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="downloadIcon('icon16', 'icon16.png')">下载 16x16</button>
+        <button onclick="downloadIcon('icon48', 'icon48.png')">下载 48x48</button>
+        <button onclick="downloadIcon('icon128', 'icon128.png')">下载 128x128</button>
+        <button onclick="downloadAllIcons()">下载所有图标</button>
+    </div>
+
+    <script>
+        // 绘制16x16图标
+        function drawIcon16() {
+            const canvas = document.getElementById('icon16');
+            const ctx = canvas.getContext('2d');
+            
+            // 背景
+            ctx.fillStyle = '#0366d6';
+            ctx.fillRect(0, 0, 16, 16);
+            
+            // GitHub图标简化版 (白色)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(2, 2, 12, 12);
+            
+            // GitHub logo 简化
+            ctx.fillStyle = '#0366d6';
+            ctx.fillRect(4, 4, 8, 8);
+            
+            // 收集箭头 (白色)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(6, 6, 4, 1);
+            ctx.fillRect(7, 7, 2, 1);
+            ctx.fillRect(8, 8, 1, 1);
+            
+            // 飞书表格图标
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(10, 10, 4, 4);
+            ctx.fillStyle = '#0366d6';
+            ctx.fillRect(11, 11, 2, 1);
+            ctx.fillRect(11, 12, 2, 1);
+        }
+        
+        // 绘制48x48图标
+        function drawIcon48() {
+            const canvas = document.getElementById('icon48');
+            const ctx = canvas.getContext('2d');
+            
+            // 背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, 48, 48);
+            gradient.addColorStop(0, '#0366d6');
+            gradient.addColorStop(1, '#0256cc');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 48, 48);
+            
+            // 圆角背景
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(6, 6, 36, 36, 6);
+            ctx.fill();
+            
+            // GitHub图标
+            ctx.fillStyle = '#0366d6';
+            ctx.beginPath();
+            ctx.roundRect(10, 10, 16, 16, 3);
+            ctx.fill();
+            
+            // GitHub logo
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('G', 18, 22);
+            
+            // 箭头指向飞书
+            ctx.fillStyle = '#28a745';
+            ctx.beginPath();
+            ctx.moveTo(28, 18);
+            ctx.lineTo(32, 18);
+            ctx.lineTo(30, 16);
+            ctx.moveTo(32, 18);
+            ctx.lineTo(30, 20);
+            ctx.stroke();
+            
+            // 飞书表格
+            ctx.fillStyle = '#28a745';
+            ctx.fillRect(32, 14, 10, 8);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(33, 15, 8, 1);
+            ctx.fillRect(33, 17, 8, 1);
+            ctx.fillRect(33, 19, 8, 1);
+            ctx.fillRect(35, 15, 1, 6);
+            ctx.fillRect(37, 15, 1, 6);
+            ctx.fillRect(39, 15, 1, 6);
+            
+            // 底部文字
+            ctx.fillStyle = '#0366d6';
+            ctx.font = '8px Arial';
+            ctx.fillText('Collector', 24, 38);
+        }
+        
+        // 绘制128x128图标
+        function drawIcon128() {
+            const canvas = document.getElementById('icon128');
+            const ctx = canvas.getContext('2d');
+            
+            // 背景渐变
+            const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 90);
+            gradient.addColorStop(0, '#0366d6');
+            gradient.addColorStop(1, '#0256cc');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 128, 128);
+            
+            // 主背景圆角矩形
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(16, 16, 96, 96, 16);
+            ctx.fill();
+            
+            // 阴影效果
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            
+            // GitHub图标区域
+            ctx.fillStyle = '#24292f';
+            ctx.beginPath();
+            ctx.roundRect(24, 24, 36, 36, 8);
+            ctx.fill();
+            
+            // 重置阴影
+            ctx.shadowColor = 'transparent';
+            
+            // GitHub logo (简化版)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('GitHub', 42, 50);
+            
+            // 流动箭头
+            ctx.strokeStyle = '#28a745';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            
+            // 第一段箭头
+            ctx.beginPath();
+            ctx.moveTo(62, 42);
+            ctx.lineTo(72, 42);
+            ctx.stroke();
+            
+            // 箭头头部
+            ctx.beginPath();
+            ctx.moveTo(68, 38);
+            ctx.lineTo(72, 42);
+            ctx.lineTo(68, 46);
+            ctx.stroke();
+            
+            // 飞书表格区域
+            ctx.fillStyle = '#28a745';
+            ctx.beginPath();
+            ctx.roundRect(68, 24, 36, 36, 8);
+            ctx.fill();
+            
+            // 表格线条
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            
+            // 水平线
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(72, 30 + i * 6);
+                ctx.lineTo(100, 30 + i * 6);
+                ctx.stroke();
+            }
+            
+            // 垂直线
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(74 + i * 7, 28);
+                ctx.lineTo(74 + i * 7, 56);
+                ctx.stroke();
+            }
+            
+            // 底部描述文字
+            ctx.fillStyle = '#0366d6';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('GitHub项目收集器', 64, 82);
+            
+            ctx.fillStyle = '#6a737d';
+            ctx.font = '10px Arial';
+            ctx.fillText('一键收集到飞书表格', 64, 96);
+        }
+        
+        // 下载图标函数
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // 下载所有图标
+        function downloadAllIcons() {
+            setTimeout(() => downloadIcon('icon16', 'icon16.png'), 100);
+            setTimeout(() => downloadIcon('icon48', 'icon48.png'), 200);
+            setTimeout(() => downloadIcon('icon128', 'icon128.png'), 300);
+        }
+        
+        // 页面加载时绘制所有图标
+        window.onload = function() {
+            drawIcon16();
+            drawIcon48();
+            drawIcon128();
+        };
+        
+        // 添加圆角矩形方法 (兼容性)
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+    </script>
+</body>
+</html>
