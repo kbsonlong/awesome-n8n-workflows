@@ -122,21 +122,21 @@
       "typeVersion": 2,
       "position": [
         20,
-        280
+        260
       ]
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=你是专业的聊天记录分析专家。你的任务是分析给定的聊天记录片段，并严格按照要求提取核心话题。\n\n### 核心分析原则 (必须严格遵守)\n\n1.  **话题识别标准**:\n    *   **数量门槛**: 至少需要3条相关的消息才能构成一个独立的话题。\n    *   **内容价值**: 话题内容必须有明确的讨论主题和价值。\n    *   **无效内容过滤**: 严禁将无意义的问候（如“早”、“在吗”）、表情符号、或简单的确认（如“好的”、“收到”）作为独立话题。\n\n2.  **话题边界判断**:\n    *   **主题延续**: 如果有新成员加入讨论，但讨论的还是同一个核心主题，这属于**同一话题**。\n    *   **主题转变**: 当讨论的焦点发生明显、不相关的转变时，必须创建**新话题**。\n    *   **时间间隔**: 如果两条消息之间没有直接关联，且时间间隔超过 **30分钟**，应视为**新话题**。\n\n### 内容生成要求\n\n1.  **话题标题 (`topic_title`)**: 生成一个简洁、精准、能概括话题核心的标题。\n2.  **话题描述 (`topic_description`)**:\n    *   **风格**: 使用生动、接地气、略带“骚话”风格的年轻人网络用语。\n    *   **内容**: 描述必须准确反映讨论的实际内容、关键信息和主要观点。\n    *   **长度**: 严格控制在 100 到 150 字之间。\n\n### 绝对输出要求 (最重要)\n\n1.  **纯JSON**: **只允许**输出有效的JSON对象。\n2.  **禁止Markdown**: **严禁**在输出的任何位置使用 ` ```json ` 或 ` ``` ` 进行包裹。\n3.  **禁止解释**: **严禁**在JSON对象前后添加任何形式的解释性文字或注释。\n4.  **群组名**: {{ $('ConfigureChatParameters').item.json.group_name }}\n\n---\n### 输出JSON格式 (严格遵守此结构)\n\n你的响应必须是一个有效的 JSON 对象，且只能是 JSON 对象。不要包含任何额外的文本、解释或 Markdown 代码块（例如，```json）。\n\n```json\n{\n  \"analysis_id\": \"群组名_日期_时间段_analysis\",\n  \"meta\": {\n    \"source\": \"群组名\",\n    \"date\": \"日期\", \n    \"segment\": \"时间段\",\n    \"total_messages\": 消息总数\n  },\n  \"topics\": [\n    {\n      \"topic_id\": \"话题1的ID\",\n      \"topic_title\": \"话题1的标题\",\n      \"topic_description\": \"话题1的详细描述，包含关键词和主要内容，至少50字\",\n      \"is_off_topic\": false,\n      \"topic_start_time\": \"话题开始时间 (ISO格式，例如: 2023-07-03T14:30:00+08:00)\",\n      \"topic_end_time\": \"话题结束时间 (ISO格式，例如: 2023-07-03T15:00:00+08:00)\",\n      \"message_seqs\": [\"构成该话题的所有消息的seq列表，例如: 1, 5, 8\"]\n    }\n  ]\n}\n```\n\n---\n### 待分析的聊天记录\n\n{{ JSON.stringify($json) }}",
+        "text": "=你是专业的聊天记录分析专家。你的任务是分析给定的聊天记录片段，并严格按照要求提取核心话题。\n\n### 核心分析原则 (必须严格遵守)\n\n1.  **话题识别标准**:\n    *   **数量门槛**: 至少需要3条相关的消息才能构成一个独立的话题。\n    *   **内容价值**: 话题内容必须有明确的讨论主题和价值。\n    *   **无效内容过滤**: 严禁将无意义的问候（如“早”、“在吗”）、表情符号、或简单的确认（如“好的”、“收到”）作为独立话题。\n\n2.  **话题边界判断**:\n    *   **主题延续**: 如果有新成员加入讨论，但讨论的还是同一个核心主题，这属于**同一话题**。\n    *   **主题转变**: 当讨论的焦点发生明显、不相关的转变时，必须创建**新话题**。\n    *   **时间间隔**: 如果两条消息之间没有直接关联，且时间间隔超过 **30分钟**，应视为**新话题**。\n\n### 内容生成要求\n\n1.  **话题标题 (`topic_title`)**: 生成一个简洁、精准、能概括话题核心的标题。\n2.  **话题描述 (`topic_description`)**:\n    *   **风格**: 使用生动、接地气、略带“骚话”风格的年轻人网络用语。\n    *   **内容**: 描述必须准确反映讨论的实际内容、关键信息和主要观点。\n    *   **长度**: 严格控制在 100 到 150 字之间。\n\n### 绝对输出要求 (最重要)\n\n1.  **纯JSON**: **只允许**输出有效的JSON对象。\n2.  **禁止Markdown**: **严禁**在输出的任何位置使用 ` ```json ` 或 ` ``` ` 进行包裹。\n3.  **禁止解释**: **严禁**在JSON对象前后添加任何形式的解释性文字或注释。\n4.  **群组名**: {{ $('ConfigureChatParameters').item.json.group_name }}\n\n---\n### 输出JSON格式 (严格遵守此结构)\n\n1. 必须返回有效的 JSON 格式\n2. 不要包含任何解释文字或 markdown 格式\n3. 不要使用 ```json``` 代码块\n4. 严格按照以下格式返回\n\nJSON 格式示例：\n{\n  \"analysis_id\": \"群组名_日期_时间段_analysis\",\n  \"meta\": {\n    \"source\": \"群组名\",\n    \"date\": \"日期\", \n    \"segment\": \"时间段\",\n    \"total_messages\": 50\n  },\n  \"topics\": [\n    {\n      \"topic_id\": \"话题1的ID\",\n      \"topic_title\": \"话题1的标题\",\n      \"topic_description\": \"话题1的详细描述，包含关键词和主要内容，至少50字\",\n      \"is_off_topic\": false,\n      \"topic_start_time\": \"话题开始时间 (ISO格式，例如: 2023-07-03T14:30:00+08:00)\",\n      \"topic_end_time\": \"话题结束时间 (ISO格式，例如: 2023-07-03T15:00:00+08:00)\",\n      \"message_seqs\": [\"构成该话题的所有消息的seq列表，例如: 1, 5, 8\"]\n    }\n  ]\n}\n\n重要：只返回 JSON，不要任何其他内容。\n\n---\n### 待分析的聊天记录\n\n{{ JSON.stringify($json) }}",
         "hasOutputParser": true,
         "batching": {}
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.7,
       "position": [
-        380,
-        260
+        560,
+        240
       ],
       "id": "0c08e2ee-bb11-45c9-80ee-836b061bb6ef",
       "name": "Extract Topics (Low Cost AI)"
@@ -149,7 +149,7 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        460,
+        720,
         420
       ],
       "id": "3c1ff1c6-50d3-4b17-a925-56a188f4ba44",
@@ -164,14 +164,14 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        920,
-        300
+        940,
+        280
       ]
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=你是聊天话题智能合并专家。你的核心任务是分析已物理合并的话题列表，找出语义相关的话题，并输出一个包含合并关系和AI总结内容的新JSON。\n\n### 核心合并原则 (必须严格遵守)\n\n1.  **语义为王**: 必须基于话题描述 (`topic_description`) 的**深层语义**进行合并，而不是简单的关键词匹配。例如，“Claude连不上”和“我的Claude今天响应很慢”应该合并，但“Claude使用技巧”和“Gemini使用技巧”则**绝对不能**合并。\n2.  **保守策略**: 宁可保留更多独立的、有价值的小话题，也绝不错误地将不相关的话题合并成一个模糊的大杂烩。如果你没有70%以上的把握，就选择不合并。\n3.  **质量提升**: 合并后的新话题，其标题和描述必须比原始话题更具信息量、更精炼、更能体现讨论的精华。\n\n### 内容生成要求\n\n1.  **合并后标题 (`merged_title`)**: 生成一个全新的、高度概括的、能体现讨论核心的精确标题。\n2.  **合并后描述 (`merged_description`)**: **严格基于**所有被合并话题的**原始内容**进行总结。必须清晰地说明讨论的完整脉络、核心观点、主要问题和结论。**严禁**编造、臆测或添加任何原始对话中不存在的信息。**严禁**出现“合并了X个话题”这种空洞的格式化描述。\n3.  **话题标签 (`topic_tags`)**: 利用你最新的知识库，为每个合并后的话题生成2-4个与时俱进的、业内认可的标签。例如：`RAG`, `Fine-tuning`, `AI Agent`, `Claude 3.5 Sonnet`, `n8n` 等。\n\n### 绝对输出要求 (最重要)\n\n1.  **纯JSON**: **只允许**输出有效的JSON对象。\n2.  **禁止Markdown**: **严禁**在输出的任何位置使用 ` ```json ` 或 ` ``` ` 进行包裹。\n3.  **禁止解释**: **严禁**在JSON对象前后添加任何形式的解释性文字或注释。\n\n---\n### 输出JSON格式 (严格遵守此结构)\n\n你的响应必须是一个有效的 JSON 对象，且只能是 JSON 对象。不要包含任何额外的文本、解释或 Markdown 代码块（例如，```json）。\n\n```json\n{\n  \"merged_topics\": [\n    {\n      \"semantic_topic_id\": \"merged_001\",\n      \"merged_title\": \"基于语义分析的精确标题\",\n      \"merged_description\": \"综合描述：详细说明合并后话题的完整内容脉络、核心观点、讨论范围和主要结论。\",\n      \"is_off_topic\": false,\n      \"semantic_category\": \"讨论类型 (例如: '问题求助', '经验分享', '技术探讨')\",\n      \"topic_tags\": [\"AI生成标签1\", \"AI生成标签2\"],\n      \"merged_from\": [\n        {\n          \"physical_id\": \"被合并的原始话题ID (例如: topic_001)\",\n          \"original_title\": \"被合并的原始话题的标题\"\n        }\n      ],\n      \"relevance_score\": 0.85,\n      \"confidence_level\": \"high\"\n    }\n  ],\n  \"merge_metadata\": {\n    \"merge_algorithm\": \"deep_semantic_analysis\",\n    \"total_merges_performed\": 1,\n    \"compression_achieved\": \"50%\"\n  }\n}\n```\n\n---\n### 待分析的物理合并后的话题数据\n\n{{ JSON.stringify($json) }}",
+        "text": "=你是聊天话题智能合并专家。你的核心任务是分析已物理合并的话题列表，找出语义相关的话题，并输出一个包含合并关系和AI总结内容的新JSON。\n\n### 核心合并原则 (必须严格遵守)\n\n1.  **语义为王**: 必须基于话题描述 (`topic_description`) 的**深层语义**进行合并，而不是简单的关键词匹配。例如，“Claude连不上”和“我的Claude今天响应很慢”应该合并，但“Claude使用技巧”和“Gemini使用技巧”则**绝对不能**合并。\n2. **合并条件**：\n   - 语义相似度 > 0.7\n   - 参与者重叠度 > 0.3\n   - 时间跨度合理（不超过4小时）\n3.  **保守策略**: \n    - 宁可保留更多独立的、有价值的小话题，也绝不错误地将不相关的话题合并成一个模糊的大杂烩。\n    - 如果你没有70%以上的把握，就选择不合并。\n4.  **质量提升**: \n    - 合并后话题应该比原话题更有价值，其标题和描述必须比原始话题更具信息量、更精炼、更能体现讨论的精华\n    - 避免为了合并而合并，保持话题的独立性\n    - 合并数量控制在2-4个话题之间\n\n### 内容生成要求\n\n1.  **合并后标题 (`merged_title`)**: 生成一个全新的、高度概括的、能体现讨论核心的精确标题。\n2.  **合并后描述 (`merged_description`)**: **严格基于**所有被合并话题的**原始内容**进行总结。必须清晰地说明讨论的完整脉络、核心观点、主要问题和结论。**严禁**编造、臆测或添加任何原始对话中不存在的信息。**严禁**出现“合并了X个话题”这种空洞的格式化描述。\n3.  **话题标签 (`topic_tags`)**: 利用你最新的知识库，为每个合并后的话题生成2-4个与时俱进的、业内认可的标签。例如：`RAG`, `Fine-tuning`, `AI Agent`, `Claude 3.5 Sonnet`, `n8n` 等。\n\n### 绝对输出要求 (最重要)\n\n1.  **纯JSON**: **只允许**输出有效的JSON对象。\n2.  **禁止Markdown**: **严禁**在输出的任何位置使用 ` ```json ` 或 ` ``` ` 进行包裹。\n3.  **禁止解释**: **严禁**在JSON对象前后添加任何形式的解释性文字或注释。\n\n---\n### 输出JSON格式 (严格遵守此结构)\n\n你的响应必须是一个有效的 JSON 对象，且只能是 JSON 对象。不要包含任何额外的文本、解释或 Markdown 代码块（例如，```json）。\n\n```json\n{\n  \"merged_topics\": [\n    {\n      \"semantic_topic_id\": \"merged_001\",\n      \"merged_title\": \"基于语义分析的精确标题\",\n      \"merged_description\": \"综合描述：详细说明合并后话题的完整内容脉络、核心观点、讨论范围和主要结论。\",\n      \"is_off_topic\": false,\n      \"semantic_category\": \"讨论类型 (例如: '问题求助', '经验分享', '技术探讨')\",\n      \"topic_tags\": [\"AI生成标签1\", \"AI生成标签2\"],\n      \"merged_from\": [\n        {\n          \"physical_id\": \"被合并的原始话题ID (例如: topic_001)\",\n          \"original_title\": \"被合并的原始话题的标题\"\n        }\n      ],\n      \"relevance_score\": 0.85,\n      \"confidence_level\": \"high\"\n    }\n  ],\n  \"merge_metadata\": {\n    \"merge_algorithm\": \"deep_semantic_analysis\",\n    \"total_merges_performed\": 1,\n    \"compression_achieved\": \"50%\"\n  }\n}\n```\n\n---\n### 待分析的物理合并后的话题数据\n\n{{ JSON.stringify($json) }}",
         "hasOutputParser": true,
         "batching": {}
       },
@@ -381,7 +381,9 @@
     },
     {
       "parameters": {
-        "options": {}
+        "options": {
+          "responseFormat": "json_object"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
       "typeVersion": 1,
@@ -412,6 +414,28 @@
       ],
       "id": "d4429c3b-c681-4468-8fc3-c4dcdc28e34d",
       "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        300
+      ],
+      "id": "18f2e2f0-a790-46cc-b2d2-3db9b7278954",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Yf5z9trrza5eqYEd",
+          "name": "LJ-Google Gemini(PaLM) Api account 3"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -601,25 +625,30 @@
     },
     "OpenRouter Chat Model": {
       "ai_languageModel": [
-        [
-          {
-            "node": "HTMLPageRender",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "DeepSeek Chat Model": {
       "ai_languageModel": [
         [
           {
-            "node": "Extract Topics (Low Cost AI)",
+            "node": "AI Semantic Merge",
             "type": "ai_languageModel",
             "index": 0
           },
           {
-            "node": "AI Semantic Merge",
+            "node": "Extract Topics (Low Cost AI)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "HTMLPageRender",
             "type": "ai_languageModel",
             "index": 0
           }
@@ -631,7 +660,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "be8acdce-12cf-475a-acb5-34993e1b7d7e",
+  "versionId": "64a940ed-99cc-4065-a062-5287b3317c2b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
