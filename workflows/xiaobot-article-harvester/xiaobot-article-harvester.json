@@ -1,0 +1,413 @@
+{
+  "name": "Xiaobot Article Harvester",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        40,
+        -80
+      ],
+      "id": "8de37f29-6ebf-4bb9-8727-ca07faa25aa3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node['配置专栏参数'].json.crawl4ai_server }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urls\": [\"{{ $json.target_url }}\"],\n  \"browser_config\": {\n    \"type\": \"BrowserConfig\", \n    \"params\": {\n      \"headless\": true,\n      \"viewport\": {\"type\": \"dict\", \"value\": {\"width\": 1200, \"height\": 800}},\n      \"headers\": {\n        \"authorization\": \"Bearer {{ $json.xiaobot_authorization }}\",\n        \"user-agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36\"\n      }\n    }\n  },\n  \"crawler_config\": {\n    \"type\": \"CrawlerRunConfig\",\n    \"params\": {\n      \"page_timeout\": 180000,\n      \"wait_until\": \"networkidle\",\n      \"delay_before_return_html\": 5.0,\n      \"js_code\": [\n        \"window.apiData = []; const originalXHR = window.XMLHttpRequest; window.XMLHttpRequest = function() { const xhr = new originalXHR(); const originalOpen = xhr.open; const originalSend = xhr.send; xhr.open = function(method, url) { this._url = url; return originalOpen.apply(this, arguments); }; xhr.send = function(data) { if (this._url && this._url.includes('api.xiaobot.net')) { const originalOnReadyStateChange = this.onreadystatechange; this.onreadystatechange = function() { if (this.readyState === 4 && this.status === 200) { try { const data = JSON.parse(this.responseText); window.apiData.push(data); } catch(e) { } } if (originalOnReadyStateChange) originalOnReadyStateChange.apply(this, arguments); }; } return originalSend.apply(this, arguments); }; return xhr; };\",\n        \"document.querySelector('div.active')?.click();\",\n        \"await new Promise(resolve => setTimeout(resolve, 5000));\",\n        \"let lastApiCount = 0; let noNewDataCount = 0; for(let i=0; i<50; i++) { window.scrollTo(0, document.body.scrollHeight); await new Promise(resolve => setTimeout(resolve, 5000)); if(window.apiData.length === lastApiCount) { noNewDataCount++; if(noNewDataCount >= 3) break; } else { noNewDataCount = 0; lastApiCount = window.apiData.length; } }\",\n        \"await new Promise(resolve => setTimeout(resolve, 5000)); window.n8nResult = { articles: [], totalCount: 0, metadata: { timestamp: new Date().toISOString(), source: 'xiaobot', totalApiCalls: window.apiData.length } }; window.apiData.forEach(apiResponse => { if (apiResponse.data && Array.isArray(apiResponse.data)) { apiResponse.data.forEach(article => { window.n8nResult.articles.push({ id: article.uuid, title: article.title, content: article.content, published_at: article.created_at, tags: article.tag_names || [] }); }); } }); window.n8nResult.totalCount = window.n8nResult.articles.length; return window.n8nResult;\"\n      ],\n      \"css_selector\": \"#posts\",\n      \"cache_mode\": \"bypass\"\n    }\n  }\n}",
+        "options": {
+          "timeout": 1000000
+        }
+      },
+      "id": "43f625a8-76fc-4421-a016-4899be781506",
+      "name": "Crawl4AI获取数据小报童",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        -300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4NxmCFNHrCOyEniT",
+          "name": "Crawl4 Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        320,
+        100
+      ],
+      "id": "314dda3c-4a9d-49a1-83ab-4ef81050cb9f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "content": "## 小报童文章自动下载\n\n### 📋 基本信息\n- 工作流名称: Xiaobot Article Harvester\n- 版本: v1.0.0\n- 创建者: LQ\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n这个工作流实现了从小报童(Xiaobot)平台自动批量下载文章内容并转换为 Markdown 格式文件的完整流程。通过模拟浏览器行为**绕过动态 API 签名限制**，实现全自动化的文章采集与格式转换。\n\n\n### 工作流优势\n  1. 自动化程度高: 一键完成从访问到保存的全流程\n  2. 绕过技术限制: 巧妙解决动态 API 签名问题\n  3. 数据完整性: 通过无限滚动获取\n\n### 配置说明\n1. 配置小报童专栏地址：将 `YOUR_COLUMN_ID` 替换为采集专栏ID\n2. 配置小报童 authorization：将 `YOUR_XIAOBOT_TOKEN_HERE` 替换为你自己的 Authorization",
+        "height": 780,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -420
+      ],
+      "id": "43403e42-e846-4a2d-9d9f-0eb41eb15c4c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 配置专栏参数 \n配置小报童专栏 URL 和 认证信息",
+        "height": 300,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -420
+      ],
+      "id": "ca98d058-903c-44f1-8e9c-ec223a08ab7a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 抓取小报童文章\n- 使用 Crawl4AI 模拟浏览器访问小报童并拦截 API 响应\n- 📢 包含所有文章信息的结构化 JSON 数据(**所以有点慢**)\n- 将文章数组拆分为单个文章项",
+        "height": 300,
+        "width": 700,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -420
+      ],
+      "id": "b5b8fe5d-7f36-4920-a92d-5cfc996a1a98",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results[0].js_execution_result.results[4].articles",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        -260
+      ],
+      "id": "f6e4fed8-0550-482c-8aa5-22eecec5df9f",
+      "name": "拆分文章列表"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 获取 raw_markdown 内容\nconst rawMarkdown = $input.first().json.data;\n\n// 转换为二进制数据\nconst binaryData = Buffer.from(rawMarkdown, 'utf8');\n\nconst item = $input.first().json;\n\n// 安全的文件名清理函数\nfunction createSafeFilename(title) {\n  if (!title) return 'untitled';\n  \n  return title\n    .replace(/[\\/\\\\:*?\"<>|]/g, '-')    // 替换非法字符为横线\n    .replace(/\\s+/g, '_')              // 空格替换为下划线\n    .replace(/-{2,}/g, '-')            // 多个横线合并\n    .replace(/_{2,}/g, '_')            // 多个下划线合并\n    .replace(/^[-_]+|[-_]+$/g, '')     // 移除首尾的横线下划线\n    .substring(0, 80);                 // 限制长度\n}\n\nconst safeTitle = createSafeFilename(item.title);\nconst publishDate = $input.first().json.published_at ? $input.first().json.published_at.split('T')[0] : 'unknown';\n\n\n// 返回二进制数据\nreturn [{\n  binary: {\n    data: {\n      data: binaryData.toString('base64'),\n      mimeType: 'text/markdown',\n      fileName: `${publishDate}_${safeTitle}`\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        120
+      ],
+      "id": "0fbd2e3b-df9f-42c3-a262-1143b89842d2",
+      "name": "处理文件信息"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1180,
+        120
+      ],
+      "id": "94609b6a-d610-428f-9751-0ddc444410d5",
+      "name": "写入延迟",
+      "webhookId": "10f5b913-2afa-4219-b429-cf2c3641b470"
+    },
+    {
+      "parameters": {
+        "content": "## 文章处理与保存\n  - 循环处理每篇文章，转换格式并保存为本地文件\n  - 对每个文章项进行HTML到Markdown转换和文件写入操作",
+        "height": 440,
+        "width": 1080,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -80
+      ],
+      "id": "e749bd85-6589-4bea-896a-b22176fb4b71",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        580,
+        120
+      ],
+      "id": "b68755aa-f611-43ec-854c-2192510f321c",
+      "name": "HTML 转 Markdown"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/tmp/{{ $binary.data.fileName }}.md",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        980,
+        120
+      ],
+      "id": "ac531e78-1902-4ec2-9446-3b77af8e631b",
+      "name": "保存 Markdown 文件"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "973d2cdb-d4dc-4533-bbb7-6445beb13a8d",
+              "name": "crawl4ai_server",
+              "value": "http://host.docker.internal:11235/crawl",
+              "type": "string"
+            },
+            {
+              "id": "7a42dfa4-b43a-44eb-a1ae-39f5eb37ee3f",
+              "name": "target_url",
+              "value": "https://www.xiaobot.net/p/<YOUR_COLUMN_ID>",
+              "type": "string"
+            },
+            {
+              "id": "f2208a2d-847c-4134-8d8c-02b7c710ffe2",
+              "name": "xiaobot_authorization",
+              "value": "<YOUR_XIAOBOT_TOKEN_HERE>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0eabfa5e-3611-421b-bf41-00a8f9067a3b",
+      "name": "配置专栏参数",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        360,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f58ac4f-517e-404c-b7d8-9da8cc8930b6",
+              "leftValue": "={{ $json.results[0].js_execution_result.results[4].totalCount }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        -300
+      ],
+      "id": "4ffc96fd-9870-46af-be90-daff55c218eb",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        -400
+      ],
+      "id": "b306bdbc-7997-43cb-b60b-d9a3fc8e1bb5",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "配置专栏参数",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl4AI获取数据小报童": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTML 转 Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "拆分文章列表": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "处理文件信息": {
+      "main": [
+        [
+          {
+            "node": "保存 Markdown 文件",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "写入延迟": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML 转 Markdown": {
+      "main": [
+        [
+          {
+            "node": "处理文件信息",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "保存 Markdown 文件": {
+      "main": [
+        [
+          {
+            "node": "写入延迟",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "配置专栏参数": {
+      "main": [
+        [
+          {
+            "node": "Crawl4AI获取数据小报童",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "拆分文章列表",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ce081092-ffdb-4f0c-947b-6c8afbbd567a",
+  "meta": {
+    "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
+  },
+  "id": "LSrBN6nAebiFqw8j",
+  "tags": []
+}

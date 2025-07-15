@@ -40,6 +40,14 @@ AI-powered translation service with RESTful API interface, supporting real-time 
 
 **Tech Stack**: n8n + Google Gemini CLI + Webhook
 
+### 📰 [Xiaobot Article Harvester](./workflows/xiaobot-article-harvester/)
+
+Automatically harvest and download articles from Xiaobot columns, converting them to Markdown format with intelligent browser automation that bypasses dynamic API signatures.
+
+**Key Features**: Browser automation, API interception, batch article download, HTML to Markdown conversion, smart file naming
+
+**Tech Stack**: n8n + Crawl4AI + Browser Automation
+
 ## Contributing
 
 Contributions are welcome! Please ensure your submission includes:
