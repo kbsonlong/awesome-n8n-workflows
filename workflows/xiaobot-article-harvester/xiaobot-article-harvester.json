@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        40,
-        -80
+        20,
+        -100
       ],
-      "id": "8de37f29-6ebf-4bb9-8727-ca07faa25aa3",
+      "id": "816d5167-ff30-48f6-89bf-34216ae5194d",
       "name": "When clicking ‘Execute workflow’"
     },
     {
@@ -33,17 +33,17 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"urls\": [\"{{ $json.target_url }}\"],\n  \"browser_config\": {\n    \"type\": \"BrowserConfig\", \n    \"params\": {\n      \"headless\": true,\n      \"viewport\": {\"type\": \"dict\", \"value\": {\"width\": 1200, \"height\": 800}},\n      \"headers\": {\n        \"authorization\": \"Bearer {{ $json.xiaobot_authorization }}\",\n        \"user-agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36\"\n      }\n    }\n  },\n  \"crawler_config\": {\n    \"type\": \"CrawlerRunConfig\",\n    \"params\": {\n      \"page_timeout\": 180000,\n      \"wait_until\": \"networkidle\",\n      \"delay_before_return_html\": 5.0,\n      \"js_code\": [\n        \"window.apiData = []; const originalXHR = window.XMLHttpRequest; window.XMLHttpRequest = function() { const xhr = new originalXHR(); const originalOpen = xhr.open; const originalSend = xhr.send; xhr.open = function(method, url) { this._url = url; return originalOpen.apply(this, arguments); }; xhr.send = function(data) { if (this._url && this._url.includes('api.xiaobot.net')) { const originalOnReadyStateChange = this.onreadystatechange; this.onreadystatechange = function() { if (this.readyState === 4 && this.status === 200) { try { const data = JSON.parse(this.responseText); window.apiData.push(data); } catch(e) { } } if (originalOnReadyStateChange) originalOnReadyStateChange.apply(this, arguments); }; } return originalSend.apply(this, arguments); }; return xhr; };\",\n        \"document.querySelector('div.active')?.click();\",\n        \"await new Promise(resolve => setTimeout(resolve, 5000));\",\n        \"let lastApiCount = 0; let noNewDataCount = 0; for(let i=0; i<50; i++) { window.scrollTo(0, document.body.scrollHeight); await new Promise(resolve => setTimeout(resolve, 5000)); if(window.apiData.length === lastApiCount) { noNewDataCount++; if(noNewDataCount >= 3) break; } else { noNewDataCount = 0; lastApiCount = window.apiData.length; } }\",\n        \"await new Promise(resolve => setTimeout(resolve, 5000)); window.n8nResult = { articles: [], totalCount: 0, metadata: { timestamp: new Date().toISOString(), source: 'xiaobot', totalApiCalls: window.apiData.length } }; window.apiData.forEach(apiResponse => { if (apiResponse.data && Array.isArray(apiResponse.data)) { apiResponse.data.forEach(article => { window.n8nResult.articles.push({ id: article.uuid, title: article.title, content: article.content, published_at: article.created_at, tags: article.tag_names || [] }); }); } }); window.n8nResult.totalCount = window.n8nResult.articles.length; return window.n8nResult;\"\n      ],\n      \"css_selector\": \"#posts\",\n      \"cache_mode\": \"bypass\"\n    }\n  }\n}",
+        "jsonBody": "={\n  \"urls\": [\"{{ $('配置专栏参数').item.json.target_url }}\"],\n  \"browser_config\": {\n    \"type\": \"BrowserConfig\", \n    \"params\": {\n      \"headless\": true,\n      \"viewport\": {\"type\": \"dict\", \"value\": {\"width\": 1200, \"height\": 800}},\n      \"headers\": {\n        \"authorization\": \"Bearer {{ $('配置专栏参数').item.json.xiaobot_authorization }}\",\n        \"user-agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36\"\n      }\n    }\n  },\n  \"crawler_config\": {\n    \"type\": \"CrawlerRunConfig\",\n    \"params\": {\n      \"page_timeout\": 180000,\n      \"wait_until\": \"networkidle\",\n      \"delay_before_return_html\": 5.0,\n      \"js_code\": [\n        \"window.apiData = []; const originalXHR = window.XMLHttpRequest; window.XMLHttpRequest = function() { const xhr = new originalXHR(); const originalOpen = xhr.open; const originalSend = xhr.send; xhr.open = function(method, url) { this._url = url; return originalOpen.apply(this, arguments); }; xhr.send = function(data) { if (this._url && this._url.includes('api.xiaobot.net')) { const originalOnReadyStateChange = this.onreadystatechange; this.onreadystatechange = function() { if (this.readyState === 4 && this.status === 200) { try { const data = JSON.parse(this.responseText); window.apiData.push(data); } catch(e) { } } if (originalOnReadyStateChange) originalOnReadyStateChange.apply(this, arguments); }; } return originalSend.apply(this, arguments); }; return xhr; };\",\n        \"document.querySelector('div.active')?.click();\",\n        \"await new Promise(resolve => setTimeout(resolve, 5000));\",\n        \"let lastApiCount = 0; let noNewDataCount = 0; for(let i=0; i<50; i++) { window.scrollTo(0, document.body.scrollHeight); await new Promise(resolve => setTimeout(resolve, 5000)); if(window.apiData.length === lastApiCount) { noNewDataCount++; if(noNewDataCount >= 3) break; } else { noNewDataCount = 0; lastApiCount = window.apiData.length; } }\",\n        \"await new Promise(resolve => setTimeout(resolve, 5000)); window.n8nResult = { articles: [], totalCount: 0, metadata: { timestamp: new Date().toISOString(), source: 'xiaobot', totalApiCalls: window.apiData.length } }; window.apiData.forEach(apiResponse => { if (apiResponse.data && Array.isArray(apiResponse.data)) { apiResponse.data.forEach(article => { window.n8nResult.articles.push({ id: article.uuid, title: article.title, content: article.content, published_at: article.created_at, tags: article.tag_names || [] }); }); } }); window.n8nResult.totalCount = window.n8nResult.articles.length; return window.n8nResult;\"\n      ],\n      \"css_selector\": \"#posts\",\n      \"cache_mode\": \"bypass\"\n    }\n  }\n}",
         "options": {
           "timeout": 1000000
         }
       },
-      "id": "43f625a8-76fc-4421-a016-4899be781506",
+      "id": "d3652471-1173-4eb2-958f-6b4f84905d9a",
       "name": "Crawl4AI获取数据小报童",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        700,
+        740,
         -300
       ],
       "credentials": {
@@ -63,12 +63,12 @@
         320,
         100
       ],
-      "id": "314dda3c-4a9d-49a1-83ab-4ef81050cb9f",
+      "id": "294692e6-5aae-4450-b425-0afb42fda2c4",
       "name": "Loop Over Items"
     },
     {
       "parameters": {
-        "content": "## 小报童文章自动下载\n\n### 📋 基本信息\n- 工作流名称: Xiaobot Article Harvester\n- 版本: v1.0.0\n- 创建者: LQ\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n这个工作流实现了从小报童(Xiaobot)平台自动批量下载文章内容并转换为 Markdown 格式文件的完整流程。通过模拟浏览器行为**绕过动态 API 签名限制**，实现全自动化的文章采集与格式转换。\n\n\n### 工作流优势\n  1. 自动化程度高: 一键完成从访问到保存的全流程\n  2. 绕过技术限制: 巧妙解决动态 API 签名问题\n  3. 数据完整性: 通过无限滚动获取\n\n### 配置说明\n1. 配置小报童专栏地址：将 `YOUR_COLUMN_ID` 替换为采集专栏ID\n2. 配置小报童 authorization：将 `YOUR_XIAOBOT_TOKEN_HERE` 替换为你自己的 Authorization",
+        "content": "## 小报童文章自动下载\n\n### 📋 基本信息\n- 工作流名称: Xiaobot Article Harvester\n- 版本: v1.0.0\n- 创建者: LQ\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n这个工作流实现了从小报童(Xiaobot)平台自动批量下载文章内容并转换为 Markdown 格式文件的完整流程。通过模拟浏览器行为**绕过动态 API 签名限制**，实现全自动化的文章采集与格式转换。\n\n\n### 🏆 工作流优势\n  1. 自动化程度高: 一键完成从访问到保存的全流程\n  2. 绕过技术限制: 巧妙解决动态 API 签名问题\n  3. 数据完整性: 通过无限滚动获取\n\n### ⚙️ 配置说明\n1. 配置小报童专栏地址：将 `YOUR_COLUMN_ID` 替换为采集专栏ID\n2. 配置小报童 authorization：将 `YOUR_XIAOBOT_TOKEN_HERE` 替换为你自己的 Authorization",
         "height": 780,
         "width": 580
       },
@@ -78,14 +78,14 @@
         -340,
         -420
       ],
-      "id": "43403e42-e846-4a2d-9d9f-0eb41eb15c4c",
+      "id": "5dc02969-ac8e-4589-8700-439c5dce220c",
       "name": "Sticky Note"
     },
     {
       "parameters": {
         "content": "## 配置专栏参数 \n配置小报童专栏 URL 和 认证信息",
         "height": 300,
-        "width": 320,
+        "width": 360,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -94,14 +94,14 @@
         260,
         -420
       ],
-      "id": "ca98d058-903c-44f1-8e9c-ec223a08ab7a",
+      "id": "dcbf36dc-2f20-425f-8736-f3e03aa13445",
       "name": "Sticky Note1"
     },
     {
       "parameters": {
         "content": "## 抓取小报童文章\n- 使用 Crawl4AI 模拟浏览器访问小报童并拦截 API 响应\n- 📢 包含所有文章信息的结构化 JSON 数据(**所以有点慢**)\n- 将文章数组拆分为单个文章项",
         "height": 300,
-        "width": 700,
+        "width": 720,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -110,7 +110,7 @@
         640,
         -420
       ],
-      "id": "b5b8fe5d-7f36-4920-a92d-5cfc996a1a98",
+      "id": "f1a0134a-7059-4745-a179-694db2a6168a",
       "name": "Sticky Note2"
     },
     {
@@ -121,23 +121,23 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1160,
+        1220,
         -260
       ],
-      "id": "f6e4fed8-0550-482c-8aa5-22eecec5df9f",
+      "id": "ae0f4c20-0b9c-436a-8fec-2d066d5d7caf",
       "name": "拆分文章列表"
     },
     {
       "parameters": {
-        "jsCode": "// 获取 raw_markdown 内容\nconst rawMarkdown = $input.first().json.data;\n\n// 转换为二进制数据\nconst binaryData = Buffer.from(rawMarkdown, 'utf8');\n\nconst item = $input.first().json;\n\n// 安全的文件名清理函数\nfunction createSafeFilename(title) {\n  if (!title) return 'untitled';\n  \n  return title\n    .replace(/[\\/\\\\:*?\"<>|]/g, '-')    // 替换非法字符为横线\n    .replace(/\\s+/g, '_')              // 空格替换为下划线\n    .replace(/-{2,}/g, '-')            // 多个横线合并\n    .replace(/_{2,}/g, '_')            // 多个下划线合并\n    .replace(/^[-_]+|[-_]+$/g, '')     // 移除首尾的横线下划线\n    .substring(0, 80);                 // 限制长度\n}\n\nconst safeTitle = createSafeFilename(item.title);\nconst publishDate = $input.first().json.published_at ? $input.first().json.published_at.split('T')[0] : 'unknown';\n\n\n// 返回二进制数据\nreturn [{\n  binary: {\n    data: {\n      data: binaryData.toString('base64'),\n      mimeType: 'text/markdown',\n      fileName: `${publishDate}_${safeTitle}`\n    }\n  }\n}];"
+        "jsCode": "// 获取 raw_markdown 内容\nconst rawMarkdown = $input.first().json.data;\n\n// 转换为二进制数据\nconst binaryData = Buffer.from(rawMarkdown, 'utf8');\n\nconst item = $input.first().json;\n\n// 安全的文件名清理函数\nfunction createSafeFilename(title) {\n  if (!title) return 'untitled';\n  \n  return title\n    .replace(/[\\/\\\\:*?\"<>|]/g, '-')    // 替换非法字符为横线\n    .replace(/\\s+/g, '_')              // 空格替换为下划线\n    .replace(/-{2,}/g, '-')            // 多个横线合并\n    .replace(/_{2,}/g, '_')            // 多个下划线合并\n    .replace(/^[-_]+|[-_]+$/g, '')     // 移除首尾的横线下划线\n    .substring(0, 80);                 // 限制长度\n}\n\n// 从 target_url 提取专栏标识符\nfunction extractColumnId(targetUrl) {\n  // 处理两种情况: /p/30AI 和 /p/30AI/\n  const match = targetUrl.match(/\\/p\\/([^\\/]+)\\/?$/);\n  return match ? match[1] : 'unknown';\n}\n\n// 获取专栏标识符 (从前面的节点获取 target_url)\nconst targetUrl = $('配置专栏参数').first().json.target_url;\nconst columnId = extractColumnId(targetUrl);\n\nconst safeTitle = createSafeFilename(item.title);\nconst publishDate = $input.first().json.published_at ? $input.first().json.published_at.split('T')[0] : 'unknown';\n\n// 返回二进制数据\nreturn [{\n  json: {\n    columnId: columnId,\n    fullPath: `/tmp/${columnId}/${publishDate}_${safeTitle}.md`\n  },\n  binary: {\n    data: {\n      data: binaryData.toString('base64'),\n      mimeType: 'text/markdown',\n      fileName: `${publishDate}_${safeTitle}`\n    }\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         780,
-        120
+        100
       ],
-      "id": "0fbd2e3b-df9f-42c3-a262-1143b89842d2",
+      "id": "9fbe742f-7512-4d2f-847e-24c3903aa0f0",
       "name": "处理文件信息"
     },
     {
@@ -147,18 +147,18 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1180,
-        120
+        1200,
+        100
       ],
-      "id": "94609b6a-d610-428f-9751-0ddc444410d5",
+      "id": "82acba78-89a0-4b14-b12b-d016850c4d98",
       "name": "写入延迟",
-      "webhookId": "10f5b913-2afa-4219-b429-cf2c3641b470"
+      "webhookId": "e5584f09-0134-4383-86cb-7d790838e564"
     },
     {
       "parameters": {
         "content": "## 文章处理与保存\n  - 循环处理每篇文章，转换格式并保存为本地文件\n  - 对每个文章项进行HTML到Markdown转换和文件写入操作",
         "height": 440,
-        "width": 1080,
+        "width": 1100,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -167,7 +167,7 @@
         260,
         -80
       ],
-      "id": "e749bd85-6589-4bea-896a-b22176fb4b71",
+      "id": "91948c5a-633c-42fe-a8e5-f80cad938850",
       "name": "Sticky Note3"
     },
     {
@@ -179,24 +179,24 @@
       "typeVersion": 1,
       "position": [
         580,
-        120
+        100
       ],
-      "id": "b68755aa-f611-43ec-854c-2192510f321c",
+      "id": "063c7c1f-2bd7-4371-97b3-ec30e092c413",
       "name": "HTML 转 Markdown"
     },
     {
       "parameters": {
         "operation": "write",
-        "fileName": "=/tmp/{{ $binary.data.fileName }}.md",
+        "fileName": "={{ $('处理文件信息').first().json.fullPath }}",
         "options": {}
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        980,
-        120
+        1000,
+        100
       ],
-      "id": "ac531e78-1902-4ec2-9446-3b77af8e631b",
+      "id": "82ac471a-7e95-4936-8d98-ec2c03b2ffb5",
       "name": "保存 Markdown 文件"
     },
     {
@@ -225,12 +225,12 @@
         },
         "options": {}
       },
-      "id": "0eabfa5e-3611-421b-bf41-00a8f9067a3b",
+      "id": "5a1660f8-eb2d-44f1-8c62-e764df294488",
       "name": "配置专栏参数",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        360,
+        300,
         -300
       ]
     },
@@ -246,7 +246,7 @@
           "conditions": [
             {
               "id": "2f58ac4f-517e-404c-b7d8-9da8cc8930b6",
-              "leftValue": "={{ $json.results[0].js_execution_result.results[4].totalCount }}",
+              "leftValue": "={{ $('Crawl4AI获取数据小报童').item.json.results[0].js_execution_result.results[4].totalCount }}",
               "rightValue": 0,
               "operator": {
                 "type": "number",
@@ -261,10 +261,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        900,
+        960,
         -300
       ],
-      "id": "4ffc96fd-9870-46af-be90-daff55c218eb",
+      "id": "03105f31-84d4-4216-8f32-196e14c21dc7",
       "name": "If"
     },
     {
@@ -272,11 +272,25 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1160,
+        1200,
         -400
       ],
-      "id": "b306bdbc-7997-43cb-b60b-d9a3fc8e1bb5",
+      "id": "5e634c34-ae89-4e00-916e-d6e791f3d2e9",
       "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "command": "=mkdir -p /tmp/{{ $('配置专栏参数').first().json.target_url.split('/p/')[1].replace('/', '') }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -300
+      ],
+      "id": "a20b1221-2489-4485-8ed4-1733f25f7cc4",
+      "name": "创建目录",
+      "alwaysOutputData": false
     }
   ],
   "pinData": {},
@@ -374,7 +388,7 @@
       "main": [
         [
           {
-            "node": "Crawl4AI获取数据小报童",
+            "node": "创建目录",
             "type": "main",
             "index": 0
           }
@@ -398,16 +412,27 @@
           }
         ]
       ]
+    },
+    "创建目录": {
+      "main": [
+        [
+          {
+            "node": "Crawl4AI获取数据小报童",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ce081092-ffdb-4f0c-947b-6c8afbbd567a",
+  "versionId": "0450eacc-4edf-4261-ad4f-aa871e24cea7",
   "meta": {
     "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
   },
-  "id": "LSrBN6nAebiFqw8j",
+  "id": "wVNikvobPurvBI8g",
   "tags": []
 }
