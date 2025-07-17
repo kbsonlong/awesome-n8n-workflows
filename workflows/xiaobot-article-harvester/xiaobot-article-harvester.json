@@ -1,15 +1,15 @@
 {
-  "name": "Xiaobot Article Harvester",
+  "name": "Xiaobot Article Harvester v2",
   "nodes": [
     {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        20,
-        -100
+        320,
+        240
       ],
-      "id": "816d5167-ff30-48f6-89bf-34216ae5194d",
+      "id": "7400be76-d60f-4bba-89e2-d23a819f52c2",
       "name": "When clicking ‘Execute workflow’"
     },
     {
@@ -38,13 +38,13 @@
           "timeout": 1000000
         }
       },
-      "id": "d3652471-1173-4eb2-958f-6b4f84905d9a",
+      "id": "e6aebd8b-767c-4e19-928d-59a1c70cb064",
       "name": "Crawl4AI获取数据小报童",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        740,
-        -300
+        1040,
+        40
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -60,25 +60,25 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        320,
-        100
+        620,
+        440
       ],
-      "id": "294692e6-5aae-4450-b425-0afb42fda2c4",
+      "id": "bc8ece36-6c3f-411b-8784-66edba37a601",
       "name": "Loop Over Items"
     },
     {
       "parameters": {
-        "content": "## 小报童文章自动下载\n\n### 📋 基本信息\n- 工作流名称: Xiaobot Article Harvester\n- 版本: v1.0.0\n- 创建者: LQ\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n这个工作流实现了从小报童(Xiaobot)平台自动批量下载文章内容并转换为 Markdown 格式文件的完整流程。通过模拟浏览器行为**绕过动态 API 签名限制**，实现全自动化的文章采集与格式转换。\n\n\n### 🏆 工作流优势\n  1. 自动化程度高: 一键完成从访问到保存的全流程\n  2. 绕过技术限制: 巧妙解决动态 API 签名问题\n  3. 数据完整性: 通过无限滚动获取\n\n### ⚙️ 配置说明\n1. 配置小报童专栏地址：将 `YOUR_COLUMN_ID` 替换为采集专栏ID\n2. 配置小报童 authorization：将 `YOUR_XIAOBOT_TOKEN_HERE` 替换为你自己的 Authorization",
+        "content": "## 小报童文章自动下载\n\n### 📋 基本信息\n- 工作流名称: Xiaobot Article Harvester\n- 版本: v1.0.2\n- 创建者: LQ\n- 微信：cloud-native-101\n- 公众号: 林月半子的AI笔记\n\n### 🎯 功能概述\n这个工作流实现了从小报童(Xiaobot)平台自动批量下载文章内容并转换为 Markdown 格式文件的完整流程。通过模拟浏览器行为**绕过动态 API 签名限制**，实现全自动化的文章采集与格式转换。\n\n\n### 🏆 工作流优势\n  1. 自动化程度高: 一键完成从访问到保存的全流程\n  2. 绕过技术限制: 巧妙解决动态 API 签名问题\n  3. 数据完整性: 通过无限滚动获取\n\n### ⚙️ 配置说明\n1. 配置小报童专栏地址：将 `YOUR_COLUMN_ID` 替换为采集专栏ID\n2. 配置小报童 authorization：将 `YOUR_XIAOBOT_TOKEN_HERE` 替换为你自己的 Authorization",
         "height": 780,
         "width": 580
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -340,
-        -420
+        -40,
+        -80
       ],
-      "id": "5dc02969-ac8e-4589-8700-439c5dce220c",
+      "id": "f8f1bdda-6dcc-43ac-a9f5-d3073962ea95",
       "name": "Sticky Note"
     },
     {
@@ -91,10 +91,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        260,
-        -420
+        560,
+        -80
       ],
-      "id": "dcbf36dc-2f20-425f-8736-f3e03aa13445",
+      "id": "4ab64bc7-5fa6-425c-b711-14126b543fd0",
       "name": "Sticky Note1"
     },
     {
@@ -107,10 +107,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        640,
-        -420
+        940,
+        -80
       ],
-      "id": "f1a0134a-7059-4745-a179-694db2a6168a",
+      "id": "7b77fe2f-8956-4502-94e8-4431fbffab9e",
       "name": "Sticky Note2"
     },
     {
@@ -121,23 +121,23 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1220,
-        -260
+        1520,
+        80
       ],
-      "id": "ae0f4c20-0b9c-436a-8fec-2d066d5d7caf",
+      "id": "de9e066a-0ec3-45fc-b8e2-b965436bf7bc",
       "name": "拆分文章列表"
     },
     {
       "parameters": {
-        "jsCode": "// 获取 raw_markdown 内容\nconst rawMarkdown = $input.first().json.data;\n\n// 转换为二进制数据\nconst binaryData = Buffer.from(rawMarkdown, 'utf8');\n\nconst item = $input.first().json;\n\n// 安全的文件名清理函数\nfunction createSafeFilename(title) {\n  if (!title) return 'untitled';\n  \n  return title\n    .replace(/[\\/\\\\:*?\"<>|]/g, '-')    // 替换非法字符为横线\n    .replace(/\\s+/g, '_')              // 空格替换为下划线\n    .replace(/-{2,}/g, '-')            // 多个横线合并\n    .replace(/_{2,}/g, '_')            // 多个下划线合并\n    .replace(/^[-_]+|[-_]+$/g, '')     // 移除首尾的横线下划线\n    .substring(0, 80);                 // 限制长度\n}\n\n// 从 target_url 提取专栏标识符\nfunction extractColumnId(targetUrl) {\n  // 处理两种情况: /p/30AI 和 /p/30AI/\n  const match = targetUrl.match(/\\/p\\/([^\\/]+)\\/?$/);\n  return match ? match[1] : 'unknown';\n}\n\n// 获取专栏标识符 (从前面的节点获取 target_url)\nconst targetUrl = $('配置专栏参数').first().json.target_url;\nconst columnId = extractColumnId(targetUrl);\n\nconst safeTitle = createSafeFilename(item.title);\nconst publishDate = $input.first().json.published_at ? $input.first().json.published_at.split('T')[0] : 'unknown';\n\n// 返回二进制数据\nreturn [{\n  json: {\n    columnId: columnId,\n    fullPath: `/tmp/${columnId}/${publishDate}_${safeTitle}.md`\n  },\n  binary: {\n    data: {\n      data: binaryData.toString('base64'),\n      mimeType: 'text/markdown',\n      fileName: `${publishDate}_${safeTitle}`\n    }\n  }\n}];"
+        "jsCode": "// 获取 raw_markdown 内容\nconst rawMarkdown = $input.first().json.data;\n\n// 转换为二进制数据\nconst binaryData = Buffer.from(rawMarkdown, 'utf8');\n\nconst item = $input.first().json;\n\n// 安全的文件名清理函数\nfunction createSafeFilename(title) {\n  if (!title) return 'untitled';\n  \n  return title\n    .replace(/[\\/\\\\:*?\"<>|]/g, '-')    // 替换非法字符为横线\n    .replace(/\\s+/g, '_')              // 空格替换为下划线\n    .replace(/-{2,}/g, '-')            // 多个横线合并\n    .replace(/_{2,}/g, '_')            // 多个下划线合并\n    .replace(/^[-_]+|[-_]+$/g, '')     // 移除首尾的横线下划线\n    .substring(0, 80);                 // 限制长度\n}\n\n// 从 target_url 提取专栏标识符\nfunction extractColumnId(targetUrl) {\n  // 处理两种情况: /p/30AI 和 /p/30AI/\n  const match = targetUrl.match(/\\/p\\/([^\\/]+)\\/?$/);\n  return match ? match[1] : 'unknown';\n}\n\n// 获取专栏标识符 (从前面的节点获取 target_url)\nconst targetUrl = $('配置专栏参数').first().json.target_url;\nconst outputBasePath = $('配置专栏参数').first().json.output_base_path;\nconst columnId = extractColumnId(targetUrl);\n\nconst safeTitle = createSafeFilename(item.title);\nconst publishDate = $input.first().json.published_at ? $input.first().json.published_at.split('T')[0] : 'unknown';\n\n// 返回二进制数据\nreturn [{\n  json: {\n    columnId: columnId,\n    fullPath: `${outputBasePath}/${columnId}/${publishDate}_${safeTitle}.md`\n  },\n  binary: {\n    data: {\n      data: binaryData.toString('base64'),\n      mimeType: 'text/markdown',\n      fileName: `${publishDate}_${safeTitle}`\n    }\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        780,
-        100
+        1080,
+        440
       ],
-      "id": "9fbe742f-7512-4d2f-847e-24c3903aa0f0",
+      "id": "be606b27-cc5f-4930-b308-c74a8cb9b47c",
       "name": "处理文件信息"
     },
     {
@@ -147,10 +147,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1200,
-        100
+        1500,
+        440
       ],
-      "id": "82acba78-89a0-4b14-b12b-d016850c4d98",
+      "id": "026f7f20-e08e-4c1a-a6b6-a2cbef5d8c6c",
       "name": "写入延迟",
       "webhookId": "e5584f09-0134-4383-86cb-7d790838e564"
     },
@@ -164,10 +164,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        260,
-        -80
+        560,
+        260
       ],
-      "id": "91948c5a-633c-42fe-a8e5-f80cad938850",
+      "id": "9cf21964-3ada-4892-aef9-848dad73b5db",
       "name": "Sticky Note3"
     },
     {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.markdown",
       "typeVersion": 1,
       "position": [
-        580,
-        100
+        880,
+        440
       ],
-      "id": "063c7c1f-2bd7-4371-97b3-ec30e092c413",
+      "id": "0a7061b5-80bc-4a6b-a9c5-b0ebbbeda13f",
       "name": "HTML 转 Markdown"
     },
     {
@@ -193,10 +193,10 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        1000,
-        100
+        1300,
+        440
       ],
-      "id": "82ac471a-7e95-4936-8d98-ec2c03b2ffb5",
+      "id": "51d8fe46-8b7c-4182-b461-053c4bf3163a",
       "name": "保存 Markdown 文件"
     },
     {
@@ -220,18 +220,24 @@
               "name": "xiaobot_authorization",
               "value": "<YOUR_XIAOBOT_TOKEN_HERE>",
               "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "name": "output_base_path",
+              "value": "/tmp",
+              "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "5a1660f8-eb2d-44f1-8c62-e764df294488",
+      "id": "66f5d392-c14c-4d0d-a700-df6d586c36b8",
       "name": "配置专栏参数",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        300,
-        -300
+        600,
+        40
       ]
     },
     {
@@ -261,10 +267,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        960,
-        -300
+        1260,
+        40
       ],
-      "id": "03105f31-84d4-4216-8f32-196e14c21dc7",
+      "id": "b0add70d-114c-4e57-b644-53fd56f66b6b",
       "name": "If"
     },
     {
@@ -272,23 +278,23 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1200,
-        -400
+        1520,
+        -60
       ],
-      "id": "5e634c34-ae89-4e00-916e-d6e791f3d2e9",
+      "id": "b9757130-850a-4766-953c-cbb5bab90123",
       "name": "No Operation, do nothing"
     },
     {
       "parameters": {
-        "command": "=mkdir -p /tmp/{{ $('配置专栏参数').first().json.target_url.split('/p/')[1].replace('/', '') }}"
+        "command": "=mkdir -p {{ $('配置专栏参数').first().json.output_base_path }}/{{ $('配置专栏参数').first().json.target_url.split('/p/')[1].replace('/', '') }}"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        480,
-        -300
+        780,
+        40
       ],
-      "id": "a20b1221-2489-4485-8ed4-1733f25f7cc4",
+      "id": "841bad96-aa4d-4715-a891-252d7356cf05",
       "name": "创建目录",
       "alwaysOutputData": false
     }
@@ -429,10 +435,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "0450eacc-4edf-4261-ad4f-aa871e24cea7",
+  "versionId": "bb0ec758-8a2f-4e43-8f6a-fa6cec127e53",
   "meta": {
     "instanceId": "1bcceb694542a87d03dcbfc74b010fcbb893175a18a9dab6ba2e57e028f57403"
   },
-  "id": "wVNikvobPurvBI8g",
+  "id": "DDmaYRKBjO5i6Fs2",
   "tags": []
 }
