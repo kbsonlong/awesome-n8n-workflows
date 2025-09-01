@@ -24,24 +24,24 @@
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.2,
       "position": [
-        -1792,
-        -64
+        432,
+        240
       ],
-      "id": "bc71bde8-6b7b-4d45-80a5-609c5dc34af5",
+      "id": "f3a34f52-0e6d-4c92-884c-ae122546b846",
       "name": "On form submission",
       "webhookId": "form-webhook-id"
     },
     {
       "parameters": {
-        "jsCode": "// Code节点 - 组装payload并初始化重试计数\nconst inputData = $input.all();\nconst prompt = $input.first().json[\"提示词\"];\n\n// 收集所有图片\nlet allUploadedImages = [];\n\nfor (const item of inputData) {\n  if (item.binary) {\n    for (const [fieldName, binaryData] of Object.entries(item.binary)) {\n      if (binaryData.mimeType && binaryData.mimeType.startsWith('image/')) {\n        allUploadedImages.push({\n          fieldName: fieldName,\n          fileName: binaryData.fileName,\n          data: binaryData\n        });\n      }\n    }\n  }\n}\n\n// 构建content数组\nconst content = [];\n\nif (prompt && prompt.trim()) {\n  content.push({\n    type: \"text\",\n    text: prompt.trim()\n  });\n}\n\n// 处理图片\nif (allUploadedImages.length > 0) {\n  for (let i = 0; i < allUploadedImages.length; i++) {\n    const imageItem = allUploadedImages[i];\n    const image = imageItem.data;\n    \n    if (image && image.data && image.mimeType) {\n      const base64Data = Buffer.isBuffer(image.data) ? \n        image.data.toString('base64') : \n        image.data;\n      \n      const imageUrl = `data:${image.mimeType};base64,${base64Data}`;\n      \n      content.push({\n        type: \"image_url\",\n        image_url: {\n          url: imageUrl\n        }\n      });\n    }\n  }\n}\n\n// 构建payload\nconst payload = {\n  model: \"google/gemini-2.5-flash-image-preview:free\",\n  messages: [\n    {\n      role: \"user\",\n      content: content\n    }\n  ]\n};\n\nif (payload.messages[0].content.length === 0) {\n  payload.messages[0].content.push({\n    type: \"text\",\n    text: \"请分析这个内容\"\n  });\n}\n\n// 返回payload和重试计数\nreturn [{\n  json: {\n    apiPayload: payload,\n    retryCount: 0,\n    maxRetries: 5,\n    originalFormData: $input.first().json\n  }\n}];"
+        "jsCode": "// Code节点 - 组装payload并初始化重试计数\nconst inputItems = $input.all();\nconst firstItem = $input.first();\nconst prompt = firstItem.json[\"提示词\"];\n\n// 收集所有图片的 binary 属性名及元数据\nconst images = [];\nfor (let itemIndex = 0; itemIndex < inputItems.length; itemIndex++) {\n  const item = inputItems[itemIndex];\n  if (!item.binary) continue;\n\n  for (const [fieldName, binaryData] of Object.entries(item.binary)) {\n    if (binaryData?.mimeType?.startsWith('image/')) {\n      images.push({\n        itemIndex,\n        propertyName: fieldName,\n        mimeType: binaryData.mimeType,\n        fileName: binaryData.fileName || `${fieldName}`,\n      });\n    }\n  }\n}\n\n// 构建 content 数组\nconst content = [];\nif (prompt && String(prompt).trim()) {\n  content.push({\n    type: \"text\",\n    text: String(prompt).trim(),\n  });\n}\n\n// 将图片转为 data URL（兼容 filesystem / 内存）\nasync function toDataUrl(itemIndex, propertyName, mime) {\n  // 官方推荐的方式：通过 helper 获取真实 Buffer\n  const buf = await this.helpers.getBinaryDataBuffer(itemIndex, propertyName); // docs: getBinaryDataBuffer\n  const b64 = buf.toString('base64');\n  return `data:${mime || 'application/octet-stream'};base64,${b64}`;\n}\n\n// 处理图片（若存在）\nfor (const img of images) {\n  const dataUrl = await toDataUrl.call(this, img.itemIndex, img.propertyName, img.mimeType);\n  content.push({\n    type: \"image_url\",\n    image_url: { url: dataUrl },\n  });\n}\n\n// 若既无文本也无图片，则补一条默认文本\nif (content.length === 0) {\n  content.push({\n    type: \"text\",\n    text: \"请分析这个内容\",\n  });\n}\n\n// 构建 payload\nconst payload = {\n  model: \"google/gemini-2.5-flash-image-preview:free\",\n  messages: [\n    {\n      role: \"user\",\n      content,\n    },\n  ],\n};\n\n// 返回 payload 和重试计数\nreturn [\n  {\n    json: {\n      apiPayload: payload,\n      retryCount: 0,\n      maxRetries: 5,\n      originalFormData: firstItem.json,\n    },\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1584,
-        -64
+        640,
+        240
       ],
-      "id": "d3e25f23-a157-4a42-a21c-92cf3a3b8f74",
+      "id": "9e027fd6-ff8e-4670-91c5-3aee2f9e1439",
       "name": "Code"
     },
     {
@@ -67,14 +67,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -1312,
-        -64
+        912,
+        240
       ],
-      "id": "e4baa01c-60f5-4cdc-a0ff-784b5f6ca9b9",
+      "id": "c1d16d0e-15d0-4ba1-b6f4-bf1dcee35832",
       "name": "HTTP Request",
       "credentials": {
         "openRouterApi": {
-          "id": "PniCfeNtv6tmsVxZ",
+          "id": "Gznd0x5bFCQLHmnw",
           "name": "OpenRouter account"
         }
       },
@@ -109,10 +109,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1088,
-        -112
+        1136,
+        192
       ],
-      "id": "4744a41c-c765-4fd2-b1d0-6f9611a5a29f",
+      "id": "2d9ccbb3-6437-426f-a50b-327f2c622f40",
       "name": "Merge Response Data"
     },
     {
@@ -122,10 +122,10 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        -1088,
-        48
+        1136,
+        352
       ],
-      "id": "d079aa9d-4448-458a-b035-5551c315985a",
+      "id": "3c0a64a6-b4f2-4f20-8a20-c693d0dd0491",
       "name": "Network Error"
     },
     {
@@ -156,10 +156,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -896,
-        -144
+        1328,
+        160
       ],
-      "id": "7b1cccaa-4275-4575-a7ac-64c967fed27d",
+      "id": "0d595785-1f04-4978-a693-d2b5c4df3652",
       "name": "Content Filter Check"
     },
     {
@@ -172,10 +172,10 @@
       "type": "n8n-nodes-base.form",
       "typeVersion": 1,
       "position": [
-        -688,
-        -272
+        1536,
+        32
       ],
-      "id": "5ea0fc21-f5c8-49b4-ac81-beedb9e08a9a",
+      "id": "4b32f4b7-ef49-4a0b-a956-cf0dfb5c553d",
       "name": "Prohibited Content End",
       "webhookId": "prohibited-webhook-id"
     },
@@ -207,10 +207,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -688,
-        -64
+        1536,
+        240
       ],
-      "id": "3c0905d2-9b13-426e-86ff-a93df8c8678f",
+      "id": "ceabc7fc-b4e3-4192-9092-f9fcfaba4b98",
       "name": "Image Check"
     },
     {
@@ -220,10 +220,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -496,
-        64
+        1728,
+        368
       ],
-      "id": "5bbca17b-a1ab-40c0-858d-8ddf5e2568d7",
+      "id": "bfec1758-ad40-4418-ba3c-70f26621b1a9",
       "name": "Wait",
       "webhookId": "wait-webhook-id"
     },
@@ -250,10 +250,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -480,
-        -176
+        1744,
+        128
       ],
-      "id": "c7c9755a-d7bc-42b8-9615-8f6aad4b81fc",
+      "id": "c9036d14-a563-4a4c-8abd-39332d9ec50b",
       "name": "Extract Image Data"
     },
     {
@@ -265,10 +265,10 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        -288,
-        -176
+        1936,
+        128
       ],
-      "id": "b0a25a58-b98a-41cb-b9d6-b08612618780",
+      "id": "554fcbc9-cb7c-4e38-af88-12da80d75dc3",
       "name": "Convert to File"
     },
     {
@@ -281,10 +281,10 @@
       "type": "n8n-nodes-base.form",
       "typeVersion": 1,
       "position": [
-        -128,
-        -176
+        2096,
+        128
       ],
-      "id": "c4d9468b-d81f-4b33-9905-c0e584d4f573",
+      "id": "e76cd19b-62c9-4048-9eae-0aaf91e67062",
       "name": "Success Form",
       "webhookId": "success-webhook-id"
     },
@@ -295,29 +295,29 @@
         "width": 214,
         "color": 3
       },
-      "id": "88675f0e-eec9-45ac-95a1-0b02460e3e91",
+      "id": "4b9c146d-13e1-46a0-8f23-eac2935516d5",
       "name": "Sticky Note12",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1376,
-        -112
+        848,
+        192
       ],
       "typeVersion": 1
     },
     {
       "parameters": {
-        "content": "## 🎨 N8N+Nano表单修图工作流\n#### [AI自动化场景实战课：让重复工作成为过去式](https://rvfdqgohv5q.feishu.cn/wiki/DkU6we3HGiKgNzkYRHLcOdBMncd)\n\n> N8N_DEFAULT_BINARY_DATA_MODE 目前只支持 default\n\n📋 基本信息\n• 工作流名称: Nano-Form-Image-Editor\n• 版本: v1.0.0\n• 技术栈: N8N + OpenRouter + Form Trigger\n• 支持模式: 文生图 + 图片修图\n\n🎯 功能概述\n基于表单的AI图像创作助手，支持纯文生图和上传图片修图两种模式。\n用户通过表单界面提交提示词和可选参考图，系统智能识别需求并调用 Nano 模型生成高质量图片。\n\n⚙️ 配置说明\n1. Form Trigger配置\n   ○ 表单标题: AI图像创作助手 - Gemini Nano\n   ○ 提示词字段: 必填文本域，支持详细描述\n   ○ 参考图字段: 可选文件上传，支持.jpg/.png/.jpeg\n\n2. Code节点关键逻辑\n   ○ 智能识别上传的图片文件\n   ○ 自动组装多模态API请求体\n   ○ 处理文本+图片的复合输入\n\n\n💡 使用场景\n• 纯文生图: 只填写提示词，快速生成创意图片\n• AI修图: 上传参考图+描述需求，智能图片编辑\n• 风格转换: 将现有图片转换为不同艺术风格\n• 角色创作: 根据描述生成角色形象或手办效果",
+        "content": "## 🎨 N8N+Nano表单修图工作流\n#### [AI自动化场景实战课：让重复工作成为过去式](https://dcn0h1uoszk5.feishu.cn/wiki/C0i9wU5S4iPWIJkONKEcbNktnAd)\n\n\n📋 基本信息\n• 工作流名称: Nano-Form-Image-Editor\n• 版本: v1.0.0\n• 技术栈: N8N + OpenRouter + Form Trigger\n• 支持模式: 文生图 + 图片修图\n\n🎯 功能概述\n基于表单的AI图像创作助手，支持纯文生图和上传图片修图两种模式。\n用户通过表单界面提交提示词和可选参考图，系统智能识别需求并调用 Nano 模型生成高质量图片。\n\n⚙️ 配置说明\n1. Form Trigger配置\n   ○ 表单标题: AI图像创作助手 - Gemini Nano\n   ○ 提示词字段: 必填文本域，支持详细描述\n   ○ 参考图字段: 可选文件上传，支持.jpg/.png/.jpeg\n\n2. Code节点关键逻辑\n   ○ 智能识别上传的图片文件\n   ○ 自动组装多模态API请求体\n   ○ 处理文本+图片的复合输入\n\n\n💡 使用场景\n• 纯文生图: 只填写提示词，快速生成创意图片\n• AI修图: 上传参考图+描述需求，智能图片编辑\n• 风格转换: 将现有图片转换为不同艺术风格\n• 角色创作: 根据描述生成角色形象或手办效果",
         "height": 720,
         "width": 2208,
         "color": 7
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -2160,
-        -432
+        64,
+        -128
       ],
       "typeVersion": 1,
-      "id": "ba9780ad-c771-4f94-8775-6db10f33186d",
+      "id": "7c7c99d4-b4ce-4b80-9717-7c34c48bfb00",
       "name": "Sticky Note"
     }
   ],
@@ -448,10 +448,10 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "bac30edf-c897-424e-bf07-546c396cd1b1",
+  "versionId": "0a055525-1458-469b-ac1a-1bf316266ece",
   "meta": {
-    "instanceId": "a152539bc323133bde80781a1dc51fefe2ad2e9f6579ca96b98f3bb66ae5bb00"
+    "instanceId": "382e376cf0c77261ab58b52fb5203072e6f3d632e43adf5a68c3823147c39dcd"
   },
-  "id": "fUu3tpY5DXzTSM0M",
+  "id": "V0iU3KKKxKRvX725",
   "tags": []
 }
