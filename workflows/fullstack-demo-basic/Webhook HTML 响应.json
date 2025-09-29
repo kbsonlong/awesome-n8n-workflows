@@ -26,7 +26,7 @@
             "entries": [
               {
                 "name": "Content-Type",
-                "value": "html"
+                "value": "text/html"
               }
             ]
           }
@@ -72,11 +72,11 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "9d044e85-b7d4-4eed-9fc5-711023d49a8d",
+  "versionId": "d8ff9f64-25d6-4067-8dc8-e9f5ec1b2352",
   "meta": {
     "instanceId": "a152539bc323133bde80781a1dc51fefe2ad2e9f6579ca96b98f3bb66ae5bb00"
   },

@@ -23,7 +23,8 @@
     {
       "parameters": {
         "endpointUrl": "=https://mcp.amap.com/mcp?key={{ $env.AMAP_API_KEY}}",
-        "serverTransport": "httpStreamable"
+        "serverTransport": "httpStreamable",
+        "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1.1,
@@ -76,7 +77,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        336,
+        352,
         112
       ],
       "id": "32cf2db5-d638-4340-b731-e6389bce3b95",
@@ -108,7 +109,7 @@
             "entries": [
               {
                 "name": "Content-Type",
-                "value": "html"
+                "value": "text/html"
               }
             ]
           }
@@ -303,7 +304,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "55941834-0e95-4378-8e1d-cf3098aa5bbc",
+  "versionId": "756dde55-c6e8-4b5c-be9b-d49c15609d29",
   "meta": {
     "instanceId": "a152539bc323133bde80781a1dc51fefe2ad2e9f6579ca96b98f3bb66ae5bb00"
   },
