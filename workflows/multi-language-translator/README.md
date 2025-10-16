@@ -34,6 +34,15 @@
 
 ## 🎬 API 使用示例
 
+```bash
+curl -X POST http://localhost:8000/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "gemini-2.5-flash",
+        "messages": [{"role": "user", "content": "你好，今天天气怎么样？"}] 
+    }'
+```
+
 ### 请求示例
 ```bash
 curl -X POST http://localhost:5678/webhook/translate \

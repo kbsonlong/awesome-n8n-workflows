@@ -114,6 +114,35 @@ async def get_config_status():
         }
     }
 
+def execute_qodercli_command(prompt: str) -> tuple[str, str, int]:
+    """执行Gemini CLI命令"""
+    try:
+        
+        # 使用shell命令方式
+        shell_command = f'echo "" | qodercli  -p "{prompt}"'
+        
+        result = subprocess.run(
+            shell_command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=60,
+            cwd=os.path.expanduser('~')
+        )
+        
+        if result.returncode == 0:
+            logger.info("qoder CLI executed successfully.")
+            return result.stdout.strip(), result.stderr, result.returncode
+        else:
+            logger.error(f"qoder CLI failed: {result.stderr}")
+            return "", result.stderr, result.returncode
+        
+    except subprocess.TimeoutExpired:
+        return "", "Command timed out", 1
+    except Exception as e:
+        return "", str(e), 1
+
+
 def execute_gemini_command(prompt: str, model: str = "gemini-2.5-flash", project_id: str = None) -> tuple[str, str, int]:
     """执行Gemini CLI命令"""
     try:
@@ -170,10 +199,13 @@ async def chat_completions(request: ChatRequest):
         prompt = user_messages[-1].content
         
         # 执行Gemini命令
-        output, error, return_code = execute_gemini_command(prompt, request.model, request.project_id)
+        # output, error, return_code = execute_gemini_command(prompt, request.model, request.project_id)
+        
+        # 执行qodercli命令
+        output, error, return_code = execute_qodercli_command(prompt)
         
         if return_code != 0:
-            raise HTTPException(status_code=500, detail=f"Gemini CLI error: {error}")
+            raise HTTPException(status_code=500, detail=f"qodercli CLI error: {error}")
         
         # 格式化为OpenAI兼容的响应
         response_payload = {
@@ -204,7 +236,10 @@ async def simple_chat(request: SimpleChatRequest):
     """简单的聊天接口（兼容之前的格式）"""
     try:
         # 执行Gemini命令
-        output, error, return_code = execute_gemini_command(request.message, request.model, request.project_id)
+        #output, error, return_code = execute_gemini_command(request.message, request.model, request.project_id)
+
+        # 执行qodercli命令
+        output, error, return_code = execute_qodercli_command(request.message)
         
         if return_code == 0:
             return SimpleChatResponse(
